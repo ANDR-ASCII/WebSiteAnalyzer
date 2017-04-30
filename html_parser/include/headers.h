@@ -25,7 +25,7 @@
 
 #ifndef HTML_PARSER_LIBRARY
 
-#define HTML_PARSER_EXPORT __declspec(dllimport)
+#define HTML_PARSER_EXPORT
 #define HTML_PARSER_EXPORT_DEPS extern
 
 #else

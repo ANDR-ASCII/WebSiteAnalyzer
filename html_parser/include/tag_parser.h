@@ -8,7 +8,7 @@ namespace HtmlParser
 
 class TagParserPrivate;
 
-class HTML_PARSER_EXPORT TagParser
+class TagParser
 {
 public:
 	using iterator = std::deque<Tag>::iterator;

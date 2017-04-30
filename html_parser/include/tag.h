@@ -6,7 +6,7 @@
 namespace HtmlParser
 {
 
-class HTML_PARSER_EXPORT Tag
+class Tag
 {
 public:
 	const std::string& name() const;

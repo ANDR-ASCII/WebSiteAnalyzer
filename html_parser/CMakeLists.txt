@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(BINARY_NAME html_parser)
-project(${BINARY_NAME})
+project(${HTMLPARSER_LIB_NAME})
 
 set(HEADERS_DIR include)
 set(SOURCES_DIR src)
@@ -24,12 +23,12 @@ add_definitions(
 )
 	
 add_library(
-	${BINARY_NAME} STATIC 
+	${HTMLPARSER_LIB_NAME} STATIC 
 	${SOURCES_LIST} 
 	${HEADERS_LIST}
 )
 
 target_link_libraries(
-	${BINARY_NAME} 
+	${HTMLPARSER_LIB_NAME} 
 	${Boost_LIBRARIES}
 )

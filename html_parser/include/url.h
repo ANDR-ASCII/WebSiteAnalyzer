@@ -2,7 +2,7 @@
 
 #include "headers.h"
 
-#pragma warning(disable: 4251)
+//#pragma warning(disable: 4251)
 
 namespace HtmlParser
 {
@@ -61,33 +61,33 @@ namespace HtmlParser
      *
      */
 
-//     class HTML_PARSER_EXPORT exErrorUrl : public std::runtime_error
-//     {
-//         std::string badUrl_;
-//     public:
-//         exErrorUrl(const std::string &details, const std::string &badUrl)
-//                 : std::runtime_error(details)
-//                 , badUrl_(badUrl)
-//                 {}
-// 
-//         exErrorUrl(const char *details, const char *badUrl)
-//                 : std::runtime_error(details)
-//                 , badUrl_(badUrl)
-//                 {}
-// 
-//         virtual ~exErrorUrl() {}
-// 
-//         virtual const char *what() const noexcept
-//         {
-//             return ("Crash regex algorithm when parsing URL: " + badUrl_ + "\n"
-//                     "===============================================================================\n"
-//                     "Details: " + std::runtime_error::what() + "\n"
-//                     "###############################################################################\n\n\n").c_str();
-//         }
-//     };
+    class exErrorUrl : public std::runtime_error
+    {
+        std::string badUrl_;
+    public:
+        exErrorUrl(const std::string &details, const std::string &badUrl)
+                : std::runtime_error(details)
+                , badUrl_(badUrl)
+                {}
+
+        exErrorUrl(const char *details, const char *badUrl)
+                : std::runtime_error(details)
+                , badUrl_(badUrl)
+                {}
+
+        virtual ~exErrorUrl() {}
+
+        virtual const char *what() const noexcept
+        {
+            return ("Crash regex algorithm when parsing URL: " + badUrl_ + "\n"
+                    "===============================================================================\n"
+                    "Details: " + std::runtime_error::what() + "\n"
+                    "###############################################################################\n\n\n").c_str();
+        }
+    };
 
 
-	class HTML_PARSER_EXPORT Url
+	class Url
 	{
     public:
         enum class FileType
@@ -208,18 +208,18 @@ namespace HtmlParser
         void removeAnchor();
 
         // static regex objects, for compile once
-//         static boost::regex s_absoluteLinkRegexPattern;
-//         static boost::regex s_relativeLinkRegexPattern;
-//         static boost::regex s_basedOnFileRegexPattern;
-//         static boost::regex s_basedOnDirsRegexPattern;
-//         static boost::regex s_slashesRegexPattern;
-//         static boost::regex s_ampersandRegexPattern;
-// 
-//         // regular expression for test occurrence on matched file(not web page)
-//         static boost::regex s_archivesRegexPattern;    // for detect archives
-//         static boost::regex s_imagesRegexPattern;      // for detect images
+        static boost::regex s_absoluteLinkRegexPattern;
+        static boost::regex s_relativeLinkRegexPattern;
+        static boost::regex s_basedOnFileRegexPattern;
+        static boost::regex s_basedOnDirsRegexPattern;
+        static boost::regex s_slashesRegexPattern;
+        static boost::regex s_ampersandRegexPattern;
 
-        //static const std::string s_executeWebFileExtensions[];
+        // regular expression for test occurrence on matched file(not web page)
+        static boost::regex s_archivesRegexPattern;    // for detect archives
+        static boost::regex s_imagesRegexPattern;      // for detect images
+
+        static const std::string s_executeWebFileExtensions[];
 
         // this method need for compare extension on match with extensions
         // of web pages such as - htm, html, php, asp, aspx(execute files)

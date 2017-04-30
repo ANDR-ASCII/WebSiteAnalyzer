@@ -5,7 +5,7 @@
 namespace HtmlParser
 {
 
-static const std::string s_executeWebFileExtensions[]
+const std::string Url::s_executeWebFileExtensions[]
 {
 	"htm",
 	"html",
@@ -14,20 +14,20 @@ static const std::string s_executeWebFileExtensions[]
 	"aspx"
 };
 
-static boost::regex s_absoluteLinkRegexPattern(
+boost::regex Url::s_absoluteLinkRegexPattern(
 	"^(https?://|//)?(www\\.)?(?:((?:[\\.\\w-]+?\\.)*))?([\\w-]+)\\."
 	"((?:[a-z]{3}\\.[a-z]{2})|(?:[a-z]{2}\\.[a-z]{3})|(?:[a-z]{2}\\.[a-z]{2})|[a-z]{2,6})(:\\d+)?(.*)?$",
 	boost::regex_constants::icase
 );
 
-static boost::regex s_relativeLinkRegexPattern(
+boost::regex Url::s_relativeLinkRegexPattern(
 	"^(?:/|//|\\|\\\\)?((?:[[:space:]\\w\\.\\+:;-]|%[0-9a-f]{2})+?(?:/|//|\\|\\\\)?)*"
 	"(?:(?:((?:/|//|\\|\\\\)?(?:[[:space:]\\w\\.\\+\\*~!:;-]|%[0-9a-f]{2})+?)(?:\\.(py|asp|php|htm|html|aspx))?)?"
 	"(\\?[[:print:]]+?)?)?(?:#.*)?$",
 	boost::regex_constants::icase
 );
 
-static boost::regex s_basedOnFileRegexPattern(
+boost::regex Url::s_basedOnFileRegexPattern(
 	"^((?:[/[:space:]\\w\\.\\+:;-]|%[0-9a-f]{2})*?)((?:(?:[[:space:]\\w\\.\\+:;-]|%[0-9a-f]{2})+)(?:\\."
 	// enumeration extensions of web pages
 	"py|asp|php|htm|html|aspx)?)"
@@ -35,20 +35,20 @@ static boost::regex s_basedOnFileRegexPattern(
 	boost::regex_constants::icase
 );
 
-static boost::regex s_basedOnDirsRegexPattern(
+boost::regex Url::s_basedOnDirsRegexPattern(
 	"^((?:/?(?:[[:space:]\\w\\.\\+:;-]|%[0-9a-f]{2})+)*/?)"
 	"(?:/\\?&?((?:\\w+(?:=?(?:[[:print:]]+)&?)?)*)?)?$",
 	boost::regex_constants::icase
 );
 
-static boost::regex s_slashesRegexPattern("^/|//|\\|\\\\$");
-static boost::regex s_ampersandRegexPattern("&amp;");
+boost::regex Url::s_slashesRegexPattern("^/|//|\\|\\\\$");
+boost::regex Url::s_ampersandRegexPattern("&amp;");
 
 /** regular expression for test occurrence on matched file(not web page) **/
 /** categories of files                                                 **/
 /** #1 archives                                                         **/
 
-static boost::regex s_archivesRegexPattern(
+boost::regex Url::s_archivesRegexPattern(
 	"^(?:(?:/|//|\\|\\\\)?(?:(?:[[:space:]\\w\\.\\+:;-]|%[0-9a-f]{2})+?)/|//|\\|\\\\)*"
 	"(?:/|//|\\|\\\\)?((?:[[:space:]\\w\\.\\+:;-]|%[0-9a-f]{2})+?)\\."
 	"("
@@ -60,7 +60,7 @@ static boost::regex s_archivesRegexPattern(
 );
 
 /** #2 images **/
-static boost::regex s_imagesRegexPattern(
+boost::regex Url::s_imagesRegexPattern(
 	"^(?:(?:/|//|\\|\\\\)?(?:(?:[[:space:]\\w\\.\\+:;-]|%[0-9a-f]{2})+?)/|//|\\|\\\\)*"
 	"(?:/|//|\\|\\\\)?(?:[[:space:]\\w\\.\\+:;-]|%[0-9a-f]{2})+?\\."
 	"jpg|gif|png|bmp|jpeg"

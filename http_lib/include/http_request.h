@@ -56,23 +56,22 @@ namespace HttpLib
 		void build();
 
 		// getters
-		const Method& getMethod() const;
-		const std::string& getRelativePath() const;
-		Version getHttpVersion() const;
-		const std::string& getHost() const;
-		const std::string& getUserAgent() const;
-		const ConnectionType& getConnectionType() const;
-		const std::string& getResRequest() const;
+		const Method& method() const;
+		const std::string& relativePath() const;
+		Version httpVersion() const;
+		const std::string& host() const;
+		const std::string& userAgent() const;
+		const ConnectionType& connectionType() const;
+		const std::string& compiledRequest() const;
 
 	private:
-
-		std::string m_resRequest;
-		std::string m_reqPath;
-		std::string m_reqHost;
-		Version reqVersion;
-		std::string m_reqUserAgent;
-		Method m_reqMethod;
-		ConnectionType m_reqConnection;
+		std::string m_compiledRequest;
+		std::string m_requestPath;
+		std::string m_requestHost;
+		Version m_requestVersion;
+		std::string m_requestUserAgent;
+		Method m_requestMethod;
+		ConnectionType m_requestConnection;
 		std::vector<std::string> m_otherHeaders;
 	};
 

@@ -61,21 +61,21 @@ namespace HtmlParser
      *
      */
 
-    class exErrorUrl : public std::runtime_error
+    class UrlParseErrorException : public std::runtime_error
     {
         std::string badUrl_;
     public:
-        exErrorUrl(const std::string &details, const std::string &badUrl)
+        UrlParseErrorException(const std::string &details, const std::string &badUrl)
                 : std::runtime_error(details)
                 , badUrl_(badUrl)
                 {}
 
-        exErrorUrl(const char *details, const char *badUrl)
+        UrlParseErrorException(const char *details, const char *badUrl)
                 : std::runtime_error(details)
                 , badUrl_(badUrl)
                 {}
 
-        virtual ~exErrorUrl() {}
+        virtual ~UrlParseErrorException() {}
 
         virtual const char *what() const noexcept
         {

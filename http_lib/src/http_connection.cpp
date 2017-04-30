@@ -1,6 +1,5 @@
 #include "stdlibs.h"
 #include "http_connection.h"
-#include "url.h"
 
 #if PLATFORM == PLATFORM_WINDOWS
 
@@ -122,7 +121,7 @@ const HttpLib::HttpResponse *HttpLib::HttpConnection::sendRequest(const HttpRequ
 		std::string answerOfServer;
 		char buffer[20000];
 		int readChars = 0;
-		send(mainSock_, request.getResRequest().c_str(), static_cast<int>(request.getResRequest().size()), 0);
+		send(mainSock_, request.compiledRequest().c_str(), static_cast<int>(request.compiledRequest().size()), 0);
 
         // synchronous I/O multiplexing
         // used for determine time-out
@@ -160,7 +159,7 @@ const HttpLib::HttpResponse *HttpLib::HttpConnection::sendRequest(const HttpRequ
 // it clear object response_ anyway
 const HttpLib::HttpResponse *HttpLib::HttpConnection::openUrl(const HttpRequest &request)
 {
-	setConnection(request.getHost());
+	setConnection(request.host());
 	sendRequest(request);
 
 	return &response_;

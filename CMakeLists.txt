@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(BINARY_NAME web_site_indexer)
+set(BINARY web_site_indexer)
 
 # .lib names
 set(HTMLPARSER_LIB_NAME html_parser)
@@ -10,7 +10,7 @@ set(NETWORKING_WINDOWS_LIB_NAME ws2_32)
 
 ##############################################
 
-project(${BINARY_NAME})
+project(${BINARY})
 
 set(HEADERS include)
 set(SOURCES src)
@@ -53,8 +53,6 @@ set(ALL_HEADERS
 	${VIEWHANDLER_HEADERS_LIST}
 )
 
-add_subdirectory(${HTMLPARSER_LIB_NAME})
-
 # Boost dependencies
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.59.0 COMPONENTS regex)
@@ -69,14 +67,16 @@ add_definitions(
 	/D _WINSOCK_DEPRECATED_NO_WARNINGS
 )
 
+add_subdirectory(${HTMLPARSER_LIB_NAME})
+
 add_executable(
-	${BINARY_NAME} 
+	${BINARY} 
 	${ALL_SOURCES} 
 	${ALL_HEADERS}
 )
 
 target_link_libraries(
-	${BINARY_NAME} 
+	${BINARY} 
 	${Boost_LIBRARIES} 
 	${HTMLPARSER_LIB_NAME} 
 	${NETWORKING_WINDOWS_LIB_NAME}

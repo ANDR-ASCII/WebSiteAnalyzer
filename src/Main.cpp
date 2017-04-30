@@ -1,6 +1,6 @@
 #include "stdlibs.h"
 #include "general_helper_functions.h"
-#include "../http_lib/include/http_connection.h"
+#include "http_connection.h"
 #include "crawler.h"
 #include "menu.h"
 

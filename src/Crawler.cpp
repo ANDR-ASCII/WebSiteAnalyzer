@@ -67,7 +67,7 @@ void CrawlerImpl::Crawler::crawlStart()
         // for correct output
         // if not set, print 200 OK, otherwise not
         bool mpOccur = false;
-        SLEEP(static_cast<DWORD>(m_timePause));
+		std::this_thread::sleep_for(std::chrono::milliseconds(m_timePause));
 
         m_request.build();
         // get address of object response_ of controller
@@ -178,6 +178,8 @@ void CrawlerImpl::Crawler::crawlStart()
 
 void CrawlerImpl::Crawler::crawlResource()
 {
+	using namespace std::chrono_literals;
+
 	HtmlParser::TagParser parser;
 
     std::size_t i = 0;
@@ -202,7 +204,7 @@ void CrawlerImpl::Crawler::crawlResource()
         try
         {
             // wait enter and in the time this is pause between http requests
-            SLEEP(static_cast<DWORD>(m_timePause));
+            std::this_thread::sleep_for(std::chrono::milliseconds(m_timePause));
 
             m_request.build();
             m_response = m_controller.openUrl(m_request);

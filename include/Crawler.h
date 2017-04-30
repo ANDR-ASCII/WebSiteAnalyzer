@@ -3,10 +3,10 @@
 #include "stdlibs.h"
 #include "url.h"
 #include "tag_parser.h"
-#include "../http_lib/include/http_response.h"
-#include "../http_lib/include/http_request.h"
-#include "../http_lib/include/http_connection.h"
-#include "../view_handler/include/crawler_viewer.h"
+#include "http_response.h"
+#include "http_request.h"
+#include "http_connection.h"
+#include "crawler_viewer.h"
 
 #if PLATFORM == PLATFORM_WINDOWS
 

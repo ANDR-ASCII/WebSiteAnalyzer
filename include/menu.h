@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stdlibs.h"
-#include "../view_handler/include/console_crawler_viewer.h"
+#include "console_crawler_viewer.h"
 #include "Crawler.h"
 #include "url.h"
 

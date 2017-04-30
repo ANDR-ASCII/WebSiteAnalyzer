@@ -1,5 +1,5 @@
 #include "stdlibs.h"
-#include "../http_lib/include/http_response.h"
+#include "http_response.h"
 #include "console_crawler_viewer.h"
 
 void ViewHandler::ConsoleCrawlerViewer::viewInfo(const std::string &url,

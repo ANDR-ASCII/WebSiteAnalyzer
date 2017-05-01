@@ -14,10 +14,6 @@ using namespace HttpLib;
 class CrawlerBase
 {
 public:
-
-
-private:
-
 	enum QueueType
 	{
 		Internal,
@@ -26,20 +22,9 @@ private:
 		IndexedEx = 8
 	};
 
-	enum class UrlType
-	{
-		Internal,
-		External,
-		Default
-	};
-
-private:
-	void crawlStart();
-	void crawlResource();
-
 	// the second argument is expected
 	// relative address indicating the file or without it
-	void addToQueue(const TagParser& parser, const Url& relativePath, UrlType urls = UrlType::Default);
+	void addToCrawlQueue(const TagParser& parser, const Url& relativePath);
 
 	// finds link in indexed and internal queues
 	bool existsInQueues(const Url& url, int queueType = Internal);
@@ -47,13 +32,10 @@ private:
 	// add link into specified queue with check on uniqueness
 	// if addition into internal queue then adds only relative path.
 	// if addition into external queue then adds subdomain + host
-	void addLinkToQueue(const Url& url, int whereToSearch);
+	void storeLinkToQueue(const Url& url, int whereToSearch);
 
 	// the flags you can pass through |. Old of C method.
 	void clearQueue(int queueType);
-
-	// reset configurations with clear internal and indexedInternal queues
-	void resetConfigurations();
 
 	/** API for conversion true relative addresses **/
 
@@ -66,18 +48,15 @@ private:
 	// the last slash should be, otherwise will not correct the results
 	std::vector<std::string> dividePath(const std::string& path);
 
-private:
+	void printReport(const std::string& text);
+
+protected:
 	std::deque<std::string> m_indexedInternal;
 	std::deque<std::string> m_indexedExternal;
 	std::deque<std::string> m_internalLinks;
 	std::deque<std::string> m_externalLinks;
 
-	HttpResponse const* m_response;
-	HttpRequest m_request;
-	HttpConnection m_controller;
-
-	// main website URL to crawl
-	HtmlParser::Url m_host;
+	Url m_host;
 
 	// stores name of file which consists from words for generate phrases
 	static const std::string s_storage_of_phrases;

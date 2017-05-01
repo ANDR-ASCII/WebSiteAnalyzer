@@ -8,81 +8,64 @@ const std::string CrawlerBase::s_storage_of_phrases = "phrases.txt";
 const std::string CrawlerBase::s_reportUrl = "url_crash_report.log";
 const std::string CrawlerBase::s_storage_urls = "table_of_addresses.ta";
 
-// second argument expect relative address with specified name file or without it
-void CrawlerBase::addToQueue(const TagParser& parser, const Url& relativePath, UrlType urls)
-{
-	Url analyzeUrl;
-	std::string resultAddr;
 
-	for (const auto& tag : parser)
+// second argument expect relative address with specified name file or without it
+void CrawlerBase::addToCrawlQueue(const TagParser& parser, const Url& relativePath)
+{
+	Url currentUrl;
+
+	for (const Tag& tag : parser)
 	{
 		try
 		{
-			analyzeUrl.parse(tag.attribute("href"));
+			currentUrl.parse(tag.attribute("href"));
+
+			if (currentUrl.isAnchor())
+			{
+				continue;
+			}
 
 			// add only web executable files
-			if (!analyzeUrl.file().empty() &&
-				analyzeUrl.fileType() != Url::FileType::ExecutableWebFile)
+			if (!currentUrl.file().empty() &&
+				currentUrl.fileType() != Url::FileType::ExecutableWebFile)
 			{
 				continue;
 			}
 
-			if (analyzeUrl.isAbsoluteAddress())
+			if (currentUrl.isAbsoluteAddress() && !currentUrl.compareHost(m_host))
 			{
-				if (!analyzeUrl.compareHost(m_host) &&
-					urls == UrlType::Default || urls == UrlType::External)
+				if(!existsInQueues(currentUrl, External))
 				{
-					// found external link
-					if (!existsInQueues(analyzeUrl, External))
+					//
+					// TODO: add this warning to the log program
+					//
+					if (currentUrl.protocol() != "https://")
 					{
-						// temporary compare
-						// while HttpLib don't support https
-						if (analyzeUrl.protocol() != "https://")
-						{
-							// add subdomain if exists
-							m_externalLinks.push_back(analyzeUrl.host());
-						}
+						m_externalLinks.push_back(currentUrl.host());
 					}
-					else
-					{
-						continue;
-					}
-
-					continue;
 				}
-			}
 
-			if (analyzeUrl.isAnchor())
-			{
 				continue;
 			}
 
-			/**
-			** WARNING
-			** There is a possibility that there will be 2 identical addresses: / and /index.php often equivalent
-			**/
+			//
+			// WARNING:
+			// There is a possibility that there will be 2 identical addresses: / and /index.php often equivalent
+			//
 
-			/** Second part. Handling relative path. **/
+			// Second part. Handling relative path.
 
 			// can throw std::runtime_error
-			resultAddr = convertRelativeAddress(analyzeUrl, relativePath);
+			std::string resultAddress = convertRelativeAddress(currentUrl, relativePath);
 
-			if (!existsInQueues(resultAddr) &&
-				urls == UrlType::Internal || urls == UrlType::Default)
+			if (!existsInQueues(resultAddress))
 			{
-				m_internalLinks.push_back(resultAddr);
+				m_internalLinks.push_back(resultAddress);
 			}
-
 		}
 		catch (UrlParseErrorException const& parsingUrlError)
 		{
-			// If failed parse link and object of Link throws exception
-			// We create report consisting from address
-			// And continues data handling
-
-			std::ofstream crash(s_reportUrl, std::ios_base::app);
-
-			crash << parsingUrlError.what() << std::endl;
+			printReport(parsingUrlError.what());
 		}
 	}
 }
@@ -138,7 +121,7 @@ bool CrawlerBase::existsInQueues(const Url& url, int queueType)
 // add link into specified queue with check on uniqueness
 // if addition into internal queue then adds only relative path.
 // if addition into external queue then adds url.getMainAddress()
-void CrawlerBase::addLinkToQueue(const Url& url, int whereToSearch)
+void CrawlerBase::storeLinkToQueue(const Url& url, int whereToSearch)
 {
 	if (whereToSearch == Internal)
 	{
@@ -200,17 +183,16 @@ void CrawlerBase::clearQueue(int queueType)
 // converts a relative path in accordance with the place where the received address
 std::string CrawlerBase::convertRelativeAddress(const Url& relAddr, const Url& where)
 {
-	// if path specified beginning slash
-	// it means path specified relative by root of website
+	// if specified path beginning with slash
+	// it means that specified path is relative by root of website
 	// returns it
 	if (relAddr.relativePath()[0] == '/')
 	{
 		return relAddr.relativePath();
 	}
 
-	if (relAddr.relativePath().empty() && where.relativeDir().empty())
+	if (relAddr.relativePath().empty() && where.relativeDirectory().empty())
 	{
-		// root
 		return "/";
 	}
 
@@ -219,7 +201,7 @@ std::string CrawlerBase::convertRelativeAddress(const Url& relAddr, const Url& w
 		return where.relativePath();
 	}
 
-	if (where.relativeDir().empty())
+	if (where.relativeDirectory().empty())
 	{
 		return relAddr.relativePath();
 	}
@@ -228,12 +210,12 @@ std::string CrawlerBase::convertRelativeAddress(const Url& relAddr, const Url& w
 	std::vector<std::string> dirFirst;
 	std::vector<std::string> dirSecond;
 
-	if (!relAddr.relativeDir().empty())
+	if (!relAddr.relativeDirectory().empty())
 	{
-		dirFirst = dividePath(relAddr.relativeDir());
+		dirFirst = dividePath(relAddr.relativeDirectory());
 	}
 
-	dirSecond = dividePath(where.relativeDir());
+	dirSecond = dividePath(where.relativeDirectory());
 
 	std::size_t sizeFirst = dirFirst.size();
 	std::size_t sizeSecond = dirSecond.size();
@@ -314,6 +296,13 @@ std::vector<std::string> CrawlerBase::dividePath(const std::string& path)
 	}
 
 	return dirs;
+}
+
+void CrawlerBase::printReport(const std::string& text)
+{
+	std::ofstream reportFileStream(s_reportUrl, std::ios_base::app);
+
+	reportFileStream << text << std::endl;
 }
 
 }

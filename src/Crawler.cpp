@@ -10,10 +10,6 @@
 namespace CrawlerImpl
 {
 
-const std::string Crawler::s_storage_of_phrases = "phrases.txt";
-const std::string Crawler::s_reportUrl = "url_crash_report.log";
-const std::string Crawler::s_storage_urls = "table_of_addresses.ta";
-
 Crawler::Crawler()
 	: m_timePause(STD_PAUSE_BETWEEN_REQUESTS)
 	, m_sign("PasBot v1.0 Alpha ")
@@ -82,7 +78,7 @@ void Crawler::crawlStart()
 			while (m_response->is_301_MovedPermanently() || m_response->is_302_MovedTemporarily())
 			{
 				m_viewerDevice->viewResponseStatus(m_response->getCodeOfResponse());
-				addLinkToQueue(m_host, IndexedEx); // save current url
+				storeLinkToQueue(m_host, IndexedEx); // save current url
 
 				// set flag
 				mpOccur = !mpOccur;
@@ -137,7 +133,7 @@ void Crawler::crawlStart()
 
 			// saves links
 			parser.parseTags(m_response->getEntityBody(), "a");
-			addToQueue(parser, m_indexedInternal.back());
+			addToCrawlQueue(parser, m_indexedInternal.back());
 
 			if (getMaxDepth() == 1)
 			{
@@ -152,7 +148,7 @@ void Crawler::crawlStart()
 			m_viewerDevice->viewWarning("Response invalid\n");
 		}
 	}
-	catch (exFailHttp const& fh)
+	catch (HttpErrorException const& fh)
 	{
 		std::cout << "Web site unavailable.\n";
 		std::ofstream fails("failConnections.log", std::ios_base::app);
@@ -237,11 +233,11 @@ void Crawler::crawlResource()
 					// if it same host
 					if (url.compareHost(m_host))
 					{
-						addLinkToQueue(url, Internal);
+						storeLinkToQueue(url, Internal);
 					}
 					else
 					{
-						addLinkToQueue(url, External);
+						storeLinkToQueue(url, External);
 					}
 
 					m_viewerDevice->viewResponseStatus(m_response->getCodeOfResponse());
@@ -253,7 +249,7 @@ void Crawler::crawlResource()
 
 					parser.parseTags(m_response->getEntityBody(), "a");
 
-					addToQueue(parser, Url(m_indexedInternal.back()));
+					addToCrawlQueue(parser, Url(m_indexedInternal.back()));
 				}
 			}
 			else
@@ -262,7 +258,7 @@ void Crawler::crawlResource()
 			}
 
 		}
-		catch (exFailHttp const& fh)
+		catch (HttpErrorException const& fh)
 		{
 			m_viewerDevice->viewWarning(fh.what() + '\n');
 			std::ofstream fails("failConnections.log", std::ios_base::app);
@@ -335,133 +331,6 @@ void Crawler::crawlResource()
 	resetConfigurations();
 }
 
-// second argument expect relative address with specified name file or without it
-void Crawler::addToQueue(const TagParser& parser, const Url& relativePath, UrlType urls)
-{
-	Url analyzeUrl;
-	std::string resultAddr;
-
-	for (const auto& tag : parser)
-	{
-		try
-		{
-			analyzeUrl.parse(tag.attribute("href"));
-
-			// add only web executable files
-			if (!analyzeUrl.file().empty() && 
-				analyzeUrl.fileType() != Url::FileType::ExecutableWebFile)
-			{
-				continue;
-			}
-
-			if (analyzeUrl.isAbsoluteAddress())
-			{
-				if (!analyzeUrl.compareHost(m_host) && 
-					urls == UrlType::Default || urls == UrlType::External)
-				{
-					// found external link
-					if (!existsInQueues(analyzeUrl, External))
-					{
-						// temporary compare
-						// while HttpLib don't support https
-						if (analyzeUrl.protocol() != "https://")
-						{
-							// add subdomain if exists
-							m_externalLinks.push_back(analyzeUrl.host());
-						}
-					}
-					else
-					{
-						continue;
-					}
-
-					continue;
-				}
-			}
-
-			if (analyzeUrl.isAnchor())
-			{
-				continue;
-			}
-
-			/**
-			** WARNING
-			** There is a possibility that there will be 2 identical addresses: / and /index.php often equivalent
-			**/
-
-			/** Second part. Handling relative path. **/
-
-			// can throw std::runtime_error
-			resultAddr = convertRelativeAddress(analyzeUrl, relativePath);
-
-			if (!existsInQueues(resultAddr) && 
-				urls == UrlType::Internal || urls == UrlType::Default)
-			{
-				m_internalLinks.push_back(resultAddr);
-			}
-
-		}
-		catch(UrlParseErrorException const& parsingUrlError)
-		{
-		    // If failed parse link and object of Link throws exception
-		    // We create report consisting from address
-		    // And continues data handling
-		 
-		    std::ofstream crash(s_reportUrl, std::ios_base::app);
-
-		    crash << parsingUrlError.what() << std::endl;
-		}
-	}
-}
-
-// true if found specified link in specified queue, otherwise false
-bool Crawler::existsInQueues(const Url& url, int whereToSearch)
-{
-	if (whereToSearch == CrawlerImpl::Crawler::Internal)
-	{
-		for (const auto &item : m_indexedInternal)
-		{
-			if (item == url.relativePath())
-			{
-				return true;
-			}
-		}
-
-		for (const auto &item : m_internalLinks)
-		{
-			if (item == url.relativePath())
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	if (whereToSearch == CrawlerImpl::Crawler::External)
-	{
-		for (const auto &item : m_indexedExternal)
-		{
-			// compare with full address
-			if (url.compareHost(item))
-			{
-				return true;
-			}
-		}
-
-		for (const auto &item : m_externalLinks)
-		{
-			// compare with full address
-			if (url.compareHost(item))
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
 void Crawler::setStartAddress(const std::string &startAddr)
 {
 	m_host.parse(startAddr);	// <= test url
@@ -526,26 +395,6 @@ void Crawler::start()
 	}
 }
 
-void Crawler::clearQueue(int queueMark)
-{
-	if ((queueMark & CrawlerImpl::Crawler::Internal) == CrawlerImpl::Crawler::Internal)
-	{
-		m_internalLinks.clear();
-	}
-	if ((queueMark & CrawlerImpl::Crawler::IndexedIn) == CrawlerImpl::Crawler::IndexedIn)
-	{
-		m_indexedInternal.clear();
-	}
-	if ((queueMark & CrawlerImpl::Crawler::External) == CrawlerImpl::Crawler::External)
-	{
-		m_externalLinks.clear();
-	}
-	if ((queueMark & CrawlerImpl::Crawler::IndexedEx) == CrawlerImpl::Crawler::IndexedEx)
-	{
-		m_indexedExternal.clear();
-	}
-}
-
 void Crawler::clearInternalQueue()
 {
 	clearQueue(CrawlerImpl::Crawler::Internal);
@@ -607,169 +456,7 @@ void Crawler::resetConfigurations()
 	m_readyForStart = false;
 	m_request.clear();
 	m_timePause = STD_PAUSE_BETWEEN_REQUESTS;
-	clearQueue(CrawlerImpl::Crawler::IndexedIn | CrawlerImpl::Crawler::Internal);
-}
-
-// add link into specified queue with check on uniqueness
-// if addition into internal queue then adds only relative path.
-// if addition into external queue then adds url.host()
-void Crawler::addLinkToQueue(const HtmlParser::Url& url, int whereToSearch)
-{
-	if (whereToSearch == CrawlerImpl::Crawler::Internal)
-	{
-		if (!existsInQueues(url))
-		{
-			m_internalLinks.push_back(url.relativePath());
-		}
-		return;
-	}
-
-	if (whereToSearch == CrawlerImpl::Crawler::IndexedIn)
-	{
-		if (!existsInQueues(url))
-		{
-			m_indexedInternal.push_back(url.relativePath());
-		}
-		return;
-	}
-
-	if (whereToSearch == CrawlerImpl::Crawler::External)
-	{
-		if (!existsInQueues(url, whereToSearch))
-		{
-			m_externalLinks.push_back(url.host());
-		}
-		return;
-	}
-
-	if (whereToSearch == CrawlerImpl::Crawler::IndexedEx)
-	{
-		if (!existsInQueues(url, whereToSearch))
-		{
-			m_indexedExternal.push_back(url.host());
-		}
-		return;
-	}
-}
-
-/** *********************** API FOR CONVERSATION TRUE RELATIVE PATHES ************************************************ **/
-
-// converts a relative path in accordance with the place where the received address
-std::string Crawler::convertRelativeAddress(const HtmlParser::Url &relAddr, const HtmlParser::Url &where)
-{
-	// if path specified beginning slash
-	// it means path specified relative by root of website
-	// returns it
-	if (relAddr.relativePath()[0] == '/')
-	{
-		return relAddr.relativePath();
-	}
-
-	if (relAddr.relativePath().empty() && where.relativeDir().empty())
-	{
-		// root
-		return "/";
-	}
-
-	if (relAddr.relativePath().empty())
-	{
-		return where.relativePath();
-	}
-
-	if (where.relativeDir().empty())
-	{
-		return relAddr.relativePath();
-	}
-
-	/** Handling **/
-	std::vector<std::string> dirFirst;
-	std::vector<std::string> dirSecond;
-
-	if (!relAddr.relativeDir().empty())
-	{
-		dirFirst = dividePath(relAddr.relativeDir());
-	}
-
-	dirSecond = dividePath(where.relativeDir());
-
-	std::size_t sizeFirst = dirFirst.size();
-	std::size_t sizeSecond = dirSecond.size();
-
-	std::size_t counter = 0;
-	std::vector<std::size_t> indexDots; // consisting indexes of elements of dots in path ./folder/
-
-	for (std::size_t i = 0; i < sizeFirst; ++i)
-	{
-		if (dirFirst[i] == "..")
-		{
-			++counter;
-		}
-
-		if (dirFirst[i] == ".")
-		{
-			indexDots.push_back(i);
-		}
-	}
-
-	std::string result;
-
-	// delete as many folders as met ".."
-	for (std::size_t i = 0; i < sizeSecond && i < counter; ++i)
-	{
-		dirSecond.pop_back();
-	}
-
-	// resize
-	sizeSecond = dirSecond.size();
-
-	// build parts of path, where received link
-	for (std::size_t i = 0; i < sizeSecond; ++i)
-	{
-		result += dirSecond[i] + '/';
-	}
-
-	// build link
-	for (auto i = counter; i < sizeFirst; ++i)
-	{
-		if (!General::findValueInVector(indexDots, i))
-		{
-			result += dirFirst[i] + '/';
-		}
-	}
-
-	// add name of file and vars
-	result += relAddr.file() + relAddr.variablesString();
-
-	return result[0] != '/' ? ('/' + result) : result;
-}
-
-// divide path by folders
-// expects path like this: [/]aaa/[bbb/[page.php[?var1=val&var2=val]]]
-// require last slash
-std::vector<std::string> Crawler::dividePath(const std::string &path)
-{
-	if (path.empty())
-	{
-		return std::vector<std::string>();
-	}
-
-	std::vector<std::string> dirs;
-	std::string::size_type pointer = path.find('/');
-
-	if (pointer != std::string::npos)
-	{
-		std::string tmpFolder;
-		std::string::size_type pos = 0;
-
-		do
-		{
-			tmpFolder.assign(path, pos, !pos ? pointer : pointer - pos);
-			dirs.push_back(tmpFolder);
-			pos = pointer + 1;
-		} while ((pointer = path.find('/', pos)) != std::string::npos);
-	}
-
-	return dirs;
+	clearQueue(IndexedIn | Internal);
 }
 
 }

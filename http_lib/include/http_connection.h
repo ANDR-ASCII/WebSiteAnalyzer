@@ -26,12 +26,12 @@ namespace HttpLib
 
     **/
 
-    class exFailHttp
+    class HttpErrorException
     {
         std::string err_;
     public:
-        exFailHttp(const std::string &errWhat) : err_(errWhat) {}
-        exFailHttp(const char *errWhat) : err_(errWhat) {}
+        HttpErrorException(const std::string &errWhat) : err_(errWhat) {}
+        HttpErrorException(const char *errWhat) : err_(errWhat) {}
 
         virtual const char *what() const
         {

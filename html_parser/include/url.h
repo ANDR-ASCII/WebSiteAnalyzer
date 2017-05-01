@@ -153,7 +153,7 @@ namespace HtmlParser
 		const std::string& protocol() const;
 		const std::string& host() const;
 		const std::string& relativePath() const;
-		const std::string& relativeDir() const;
+		const std::string& relativeDirectory() const;
 		const std::string& file() const;
 		const std::string& anchor() const;
 		const std::string& topLevelDomain() const;
@@ -183,7 +183,7 @@ namespace HtmlParser
 		std::string m_protocol;
 		std::string m_host;
 		std::string m_path;
-		std::string m_relativeDir;
+		std::string m_relativeDirectory;
 		std::string m_file;
 		std::string m_anchorName;
         std::string m_fileExtension;
@@ -202,7 +202,7 @@ namespace HtmlParser
         // parsing relative path by parts
         // must be called after handling of possible errors
         void parseRelativePath();
-        void parseGetVars(const std::string& vars);
+        void parseMethodGetVariables(const std::string& vars);
 
         // remove anchor from relative path if it exists: path_
         void removeAnchor();

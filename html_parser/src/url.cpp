@@ -101,7 +101,7 @@ bool Url::operator==(const Url& other) const
 	}
 
 	if (Common::strToLower(host()) == Common::strToLower(other.host()) &&
-		relativeDir() == other.relativeDir() &&
+		relativeDirectory() == other.relativeDirectory() &&
 		file() == other.file())
 	{
 		if (m_variables.size() != other.m_variables.size())
@@ -211,7 +211,7 @@ void Url::parse(const std::string &testLnk)
 			m_topLevelDomain = partsOfLink[5];
 
 			// separate directory
-			if (m_relativeDir != "/")
+			if (m_relativeDirectory != "/")
 			{
 				// remove anchor
 				removeAnchor();
@@ -253,7 +253,6 @@ void Url::parse(const std::string &testLnk)
 // otherwise nothing not do
 void Url::removeAnchor()
 {
-	// remove anchor
 	std::string::size_type anchorIndex = m_path.rfind('#');
 
 	if (anchorIndex != std::string::npos)
@@ -268,11 +267,11 @@ void Url::parseRelativePath()
 {
 	boost::smatch firstCmp, sm;
 
-	/**
-	** NOTE:
-	**      /some  - some is a file without extension.
-	**      /some/ - some is a folder.
-	**/
+	//
+	// NOTE:
+	//		/some  - some is a file without extension.
+	//		/some/ - some is a folder.
+	//
 
 	// If file found
 	if ((boost::regex_search(m_path, firstCmp, s_basedOnFileRegexPattern)))
@@ -286,7 +285,7 @@ void Url::parseRelativePath()
 				m_file = sm[1] + '.' + sm[2];
 				m_fileExtension = sm[2];
 
-				m_relativeDir.assign(m_path, 0, m_path.find(m_file));
+				m_relativeDirectory.assign(m_path, 0, m_path.find(m_file));
 				m_fileType = FileType::Archive;
 				return;
 			}
@@ -297,7 +296,7 @@ void Url::parseRelativePath()
 				m_file = sm[1] + '.' + sm[2];
 				m_fileExtension = sm[2];
 
-				m_relativeDir.assign(m_path, 0, m_path.find(m_file));
+				m_relativeDirectory.assign(m_path, 0, m_path.find(m_file));
 				m_fileType = FileType::Image;
 				return;
 			}
@@ -306,36 +305,36 @@ void Url::parseRelativePath()
 		// obtains the directories and get variables
 		m_file = boost::regex_replace(m_path, s_basedOnFileRegexPattern, "$2");
 
-		std::string::size_type lbl = std::string::npos;
-		if ((lbl = m_file.find(".")) != std::string::npos)
+		std::string::size_type label = std::string::npos;
+
+		if ((label = m_file.find(".")) != std::string::npos)
 		{
-			m_fileExtension.assign(m_file, lbl + 1, std::string::npos);
+			m_fileExtension.assign(m_file, label + 1, std::string::npos);
 		}
 
 		if (m_fileType == FileType::Undefined)
 		{
-			// if after all tests type of extensions not set
-			// then set type as EXECUTE_WEB_FILE
+			// if after all tests type of file didn't determined
+			// then set type as ExecutableWebFile
 
 			// such behavior by default
 			m_fileType = FileType::ExecutableWebFile;
 		}
 
 		// if file found but can not be found folders or/and get variables
-		m_relativeDir = boost::regex_replace(m_path, s_basedOnFileRegexPattern, "$1");
+		m_relativeDirectory = boost::regex_replace(m_path, s_basedOnFileRegexPattern, "$1");
 		m_variablesString = boost::regex_replace(m_path, s_basedOnFileRegexPattern, "$3");
 
 		if (!m_variablesString.empty())
 		{
-			parseGetVars(m_variablesString);
+			parseMethodGetVariables(m_variablesString);
 			m_variablesString = "?" + m_variablesString;
 		}
 
-		if (m_relativeDir == m_path)
+		if (m_relativeDirectory == m_path)
 		{
-			m_relativeDir.clear();
+			m_relativeDirectory.clear();
 		}
-
 	}
 	else
 	{
@@ -344,14 +343,14 @@ void Url::parseRelativePath()
 		// if found folder or get variables
 		if (boost::regex_search(m_path, sm, s_basedOnDirsRegexPattern))
 		{
-			m_relativeDir = sm[1];
+			m_relativeDirectory = sm[1];
 			m_variablesString = sm[2];
 
 			if (!m_variablesString.empty())
 			{
-				parseGetVars(m_variablesString);
+				parseMethodGetVariables(m_variablesString);
 				m_variablesString = "?" + m_variablesString;
-				m_relativeDir.append("/");
+				m_relativeDirectory.append("/");
 			}
 		}
 		else
@@ -363,7 +362,7 @@ void Url::parseRelativePath()
 }
 
 //
-void Url::parseGetVars(const std::string &vars)
+void Url::parseMethodGetVariables(const std::string &vars)
 {
 	boost::regex exp("(.*?)=(.*)");
 
@@ -404,7 +403,7 @@ void Url::clear()
 	m_protocol.clear();
 	m_host.clear();
 	m_path.clear();
-	m_relativeDir.clear();
+	m_relativeDirectory.clear();
 	m_file.clear();
 	m_anchorName.clear();
 	m_variables.clear();
@@ -544,9 +543,9 @@ const std::string& Url::relativePath() const
 	return m_path;
 }
 
-const std::string& Url::relativeDir() const
+const std::string& Url::relativeDirectory() const
 {
-	return m_relativeDir;
+	return m_relativeDirectory;
 }
 
 const std::string& Url::file() const

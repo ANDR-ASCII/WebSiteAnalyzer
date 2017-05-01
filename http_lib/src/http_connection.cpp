@@ -77,7 +77,7 @@ void HttpLib::HttpConnection::setConnection(const std::string &server)
 	// recreate a socket for new connection
 	if ( (mainSock_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == CANNOT_CREATE_SOCKET)
 	{
-	    throw HttpLib::exFailHttp("Fail to create a socket.\n");
+	    throw HttpLib::HttpErrorException("Fail to create a socket.\n");
 	}
 
 	servAddr_.sin_family = AF_INET;
@@ -95,7 +95,7 @@ void HttpLib::HttpConnection::setConnection(const std::string &server)
         // 1 if successful conversion of address
         else if ((servAddr_.sin_addr.s_addr = inet_addr(lastServerName.c_str())))
         {
-            throw HttpLib::exFailHttp("Fail to get IPv4 address of server.\n");
+            throw HttpLib::HttpErrorException("Fail to get IPv4 address of server.\n");
         }
     }
 
@@ -106,7 +106,7 @@ void HttpLib::HttpConnection::setConnection(const std::string &server)
 		return;
 	}
 
-    throw HttpLib::exFailHttp("Fail to connect by server.\n");
+    throw HttpLib::HttpErrorException("Fail to connect by server.\n");
 }
 
 // Sends request by server and returns response
@@ -134,11 +134,11 @@ const HttpLib::HttpResponse *HttpLib::HttpConnection::sendRequest(const HttpRequ
 
         if(retval == -1)
         {
-            throw HttpLib::exFailHttp("multiplexing error.\n");
+            throw HttpLib::HttpErrorException("multiplexing error.\n");
         }
 		if(!retval)
         {
-            throw HttpLib::exFailHttp("Time-out.\n");
+            throw HttpLib::HttpErrorException("Time-out.\n");
         }
 
 		// Algorithm for read TCP fragments ====================================================

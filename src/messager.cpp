@@ -4,7 +4,7 @@
 namespace CrawlerImpl
 {
 
-void Messager::sendMessage(const IMessage* message) const noexcept
+void Messager::sendMessage(const IMessage& message) const noexcept
 {
 	for (auto receiver : m_receivers)
 	{

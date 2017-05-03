@@ -28,7 +28,7 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 			{
 				if (currentUrl.protocol() != "https://")
 				{
-					sendMessage(&httpsWarning);
+					sendMessage(httpsWarning);
 					continue;
 				}
 
@@ -36,7 +36,7 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 				{
 					m_externalUrlQueue.emplace(currentUrl.host());
 
-					sendMessage(&QueueItersAndRefsInvalidatedMessage{ ExternalUrlQueue });
+					sendMessage(QueueItersAndRefsInvalidatedMessage{ ExternalUrlQueue });
 				}
 
 				continue;
@@ -46,7 +46,7 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 			{
 				if (currentUrl.protocol() != "https://")
 				{
-					sendMessage(&httpsWarning);
+					sendMessage(httpsWarning);
 					continue;
 				}
 
@@ -54,7 +54,7 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 				{
 					m_internalUrlQueue.emplace(currentUrl.relativePath());
 
-					sendMessage(&QueueItersAndRefsInvalidatedMessage{ InternalUrlQueue });
+					sendMessage(QueueItersAndRefsInvalidatedMessage{ InternalUrlQueue });
 				}
 
 				continue;
@@ -71,16 +71,16 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 			{
 				m_internalUrlQueue.emplace(url.relativePath());
 
-				sendMessage(&QueueItersAndRefsInvalidatedMessage{ InternalUrlQueue });
+				sendMessage(QueueItersAndRefsInvalidatedMessage{ InternalUrlQueue });
 			}
 		}
 		catch (UrlParseErrorException const& parsingUrlError)
 		{
-			sendMessage(&WarningMessage{ parsingUrlError.what() });
+			sendMessage(WarningMessage{ parsingUrlError.what() });
 		}
 	}
 
-	sendMessage(&QueueSizeMessage{ InternalUrlQueue, size(InternalUrlQueue) });
+	sendMessage(QueueSizeMessage{ InternalUrlQueue, size(InternalUrlQueue) });
 }
 
 void CrawlerModel::storeUrl(const Url& url, int queueType)
@@ -113,8 +113,8 @@ CrawlerModel::SmartModelElementPtr CrawlerModel::moveUrl(const Url& urlKey, int 
 
 	queue(fromQueueType)->erase(iter);
 
-	sendMessage(&QueueItersAndRefsInvalidatedMessage{ fromQueueType });
-	sendMessage(&QueueItersAndRefsInvalidatedMessage{ toQueueType });
+	sendMessage(QueueItersAndRefsInvalidatedMessage{ fromQueueType });
+	sendMessage(QueueItersAndRefsInvalidatedMessage{ toQueueType });
 
 	SmartModelElementPtr pointer{ new SmartModelElement(std::addressof(*insertionResult.first), this, toQueueType) };
 	addReceiver(pointer.get());
@@ -169,14 +169,14 @@ CrawlerModel::SmartModelElement::~SmartModelElement()
 	m_model->deleteReceiver(this);
 }
 
-void CrawlerModel::SmartModelElement::receiveMessage(const IMessage* message)
+void CrawlerModel::SmartModelElement::receiveMessage(const IMessage& message)
 {
-	if (message->type() == IMessage::MessageType::QueueItersAndRefsInvalidated)
+	if (message.type() == IMessage::MessageType::QueueItersAndRefsInvalidated)
 	{
-		const QueueItersAndRefsInvalidatedMessage* invalidatedItersAndRefsMessage =
-				static_cast<const QueueItersAndRefsInvalidatedMessage*>(message);
+		const QueueItersAndRefsInvalidatedMessage& invalidatedItersAndRefsMessage =
+				static_cast<const QueueItersAndRefsInvalidatedMessage&>(message);
 
-		if (invalidatedItersAndRefsMessage->queueType() == m_queueType)
+		if (invalidatedItersAndRefsMessage.queueType() == m_queueType)
 		{
 			m_pointerInvalidated = true;
 		}

@@ -24,7 +24,7 @@ class ConsoleCrawlerViewer
 	void viewWarning(const std::string &warning) const;
 
 protected:
-	virtual void receiveMessage(const CrawlerImpl::IMessage* message) override;
+	virtual void receiveMessage(const CrawlerImpl::IMessage& message) override;
 };
 
 }

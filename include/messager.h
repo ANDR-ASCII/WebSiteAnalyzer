@@ -12,7 +12,7 @@ struct IMessageReceiver;
 class Messager
 {
 public:
-	void sendMessage(const IMessage* message) const noexcept;
+	void sendMessage(const IMessage& message) const noexcept;
 	void addReceiver(IMessageReceiver* receiver);
 	void deleteReceiver(IMessageReceiver* receiver);
 

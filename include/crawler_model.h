@@ -35,7 +35,7 @@ public:
 		friend class CrawlerModel;
 
 	protected:
-		void receiveMessage(const IMessage* message) override;
+		void receiveMessage(const IMessage& message) override;
 
 	public:
 		~SmartModelElement();

@@ -270,46 +270,46 @@ void ViewHandler::ConsoleCrawlerViewer::viewWarning(const std::string &warning) 
 	std::cout << warning << std::endl;
 }
 
-void ViewHandler::ConsoleCrawlerViewer::receiveMessage(const CrawlerImpl::IMessage* message)
+void ViewHandler::ConsoleCrawlerViewer::receiveMessage(const CrawlerImpl::IMessage& message)
 {
 	using namespace CrawlerImpl;
 
-	switch (message->type())
+	switch (message.type())
 	{
 		case IMessage::MessageType::CurrentRequestedUrl:
 		{
-			const CurrentRequestedUrlMessage* actualMessageType =
-				static_cast<const CurrentRequestedUrlMessage*>(message);
+			const CurrentRequestedUrlMessage& actualMessageType =
+				static_cast<const CurrentRequestedUrlMessage&>(message);
 
-			viewCurrentRequestedUrl(actualMessageType->url());
+			viewCurrentRequestedUrl(actualMessageType.url());
 
 			break;
 		}
 
 		case IMessage::MessageType::CurrentQueueSize:
 		{
-			const QueueSizeMessage* actualMessageType = 
-				static_cast<const QueueSizeMessage*>(message);
+			const QueueSizeMessage& actualMessageType = 
+				static_cast<const QueueSizeMessage&>(message);
 
-			assert(actualMessageType->queueType() == CrawlerModel::InternalUrlQueue ||
-				actualMessageType->queueType() == CrawlerModel::InternalCrawledUrlQueue ||
-				actualMessageType->queueType() == CrawlerModel::ExternalUrlQueue ||
-				actualMessageType->queueType() == CrawlerModel::ExternalCrawledUrlQueue
+			assert(actualMessageType.queueType() == CrawlerModel::InternalUrlQueue ||
+				actualMessageType.queueType() == CrawlerModel::InternalCrawledUrlQueue ||
+				actualMessageType.queueType() == CrawlerModel::ExternalUrlQueue ||
+				actualMessageType.queueType() == CrawlerModel::ExternalCrawledUrlQueue
 			);
 
-			if (actualMessageType->queueType() == CrawlerModel::InternalUrlQueue)
+			if (actualMessageType.queueType() == CrawlerModel::InternalUrlQueue)
 			{
-				viewInternalUrlsSize(actualMessageType->size());
+				viewInternalUrlsSize(actualMessageType.size());
 			}
 
-			if (actualMessageType->queueType() == CrawlerModel::InternalCrawledUrlQueue)
+			if (actualMessageType.queueType() == CrawlerModel::InternalCrawledUrlQueue)
 			{
-				viewInternalCrawlerUrlsSize(actualMessageType->size());
+				viewInternalCrawlerUrlsSize(actualMessageType.size());
 			}
 
-			if (actualMessageType->queueType() == CrawlerModel::ExternalUrlQueue)
+			if (actualMessageType.queueType() == CrawlerModel::ExternalUrlQueue)
 			{
-				viewExternalUrlsSize(actualMessageType->size());
+				viewExternalUrlsSize(actualMessageType.size());
 			}
 
 			break;
@@ -317,20 +317,20 @@ void ViewHandler::ConsoleCrawlerViewer::receiveMessage(const CrawlerImpl::IMessa
 
 		case IMessage::MessageType::HttpResponseCode:
 		{
-			const HttpResponseCodeMessage* actualMessageType =
-				static_cast<const HttpResponseCodeMessage*>(message);
+			const HttpResponseCodeMessage& actualMessageType =
+				static_cast<const HttpResponseCodeMessage&>(message);
 
-			viewResponseStatus(actualMessageType->code());
+			viewResponseStatus(actualMessageType.code());
 
 			break;
 		}
 
 		case IMessage::MessageType::WarningType:
 		{
-			const WarningMessage* actualMessageType =
-				static_cast<const WarningMessage*>(message);
+			const WarningMessage& actualMessageType =
+				static_cast<const WarningMessage&>(message);
 
-			viewWarning(actualMessageType->warning());
+			viewWarning(actualMessageType.warning());
 
 			break;
 		}

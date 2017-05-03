@@ -54,10 +54,10 @@ void CrawlerController::startCrawling()
 
 		std::this_thread::sleep_for(settings()->requestPause());
 
-		sendMessage(&CurrentRequestedUrlMessage{ settings()->startUrlAddress().host() + url->value()->relativePath() });
-		sendMessage(&QueueSizeMessage{ CrawlerModel::InternalUrlQueue, model()->size(CrawlerModel::InternalUrlQueue) });
-		sendMessage(&QueueSizeMessage{ CrawlerModel::InternalCrawledUrlQueue, model()->size(CrawlerModel::InternalCrawledUrlQueue) });
-		sendMessage(&QueueSizeMessage{ CrawlerModel::ExternalUrlQueue, model()->size(CrawlerModel::ExternalUrlQueue) });
+		sendMessage(CurrentRequestedUrlMessage{ settings()->startUrlAddress().host() + url->value()->relativePath() });
+		sendMessage(QueueSizeMessage{ CrawlerModel::InternalUrlQueue, model()->size(CrawlerModel::InternalUrlQueue) });
+		sendMessage(QueueSizeMessage{ CrawlerModel::InternalCrawledUrlQueue, model()->size(CrawlerModel::InternalCrawledUrlQueue) });
+		sendMessage(QueueSizeMessage{ CrawlerModel::ExternalUrlQueue, model()->size(CrawlerModel::ExternalUrlQueue) });
 
 		request.setRelativePath(url->value()->relativePath());
 		request.build();
@@ -69,7 +69,7 @@ void CrawlerController::startCrawling()
 			// TODO: handle this error at the start crawling
 			//
 
-			sendMessage(&WarningMessage{ "Invalid response of server" });
+			sendMessage(WarningMessage{ "Invalid response of server" });
 			continue;
 		}
 
@@ -84,7 +84,7 @@ void CrawlerController::startCrawling()
 			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), *url->value());
 		}
 
-		sendMessage(&HttpResponseCodeMessage{ response->responseCode() });
+		sendMessage(HttpResponseCodeMessage{ response->responseCode() });
 	}
 }
 
@@ -97,7 +97,7 @@ void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response)
 
 	if (settings()->startUrlAddress().protocol() == "https://")
 	{
-		sendMessage(&WarningMessage{ "Current HTTP library does not support HTTPS protocol" });
+		sendMessage(WarningMessage{ "Current HTTP library does not support HTTPS protocol" });
 		return;
 	}
 

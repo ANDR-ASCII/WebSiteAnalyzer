@@ -7,7 +7,7 @@ namespace CrawlerImpl
 
 struct IMessageReceiver
 {
-	virtual void receiveMessage(const IMessage* message) = 0;
+	virtual void receiveMessage(const IMessage& message) = 0;
 };
 
 }

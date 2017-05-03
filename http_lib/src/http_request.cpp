@@ -2,7 +2,7 @@
 #include "http_request.h"
 
 HttpLib::HttpRequest::HttpRequest()
-    : m_requestVersion(Version::V_1_1)
+    : m_requestVersion(Version::Version1_1)
     , m_requestMethod(Method::Get)
     , m_requestConnection(ConnectionType::KeepAlive)
 {
@@ -122,7 +122,7 @@ void HttpLib::HttpRequest::build()
     // build request
     // main header
     m_compiledRequest = m_requestMethod == Method::Get ? "GET " : m_requestMethod == Method::Post ? "POST " : "HEAD ";
-    m_compiledRequest += m_requestPath + " " + (m_requestVersion == Version::V_1_0 ? "HTTP/1.0" : "HTTP/1.1") + "\r\n";
+    m_compiledRequest += m_requestPath + " " + (m_requestVersion == Version::Version1_0 ? "HTTP/1.0" : "HTTP/1.1") + "\r\n";
 
     m_compiledRequest += "Host: " + m_requestHost + "\r\n";
 
@@ -190,7 +190,7 @@ const std::string &HttpLib::HttpRequest::compiledRequest() const
 void HttpLib::HttpRequest::clear()
 {
 	m_requestConnection = ConnectionType::KeepAlive;
-	m_requestVersion = Version::V_1_1;
+	m_requestVersion = Version::Version1_1;
 	m_requestMethod = Method::Get;
 
 	m_compiledRequest.clear();

@@ -23,72 +23,71 @@ namespace HttpLib
 	{
     public:
 
-        enum CODE_OF_RESPONSE
+        enum ResponseCode
         {
-              _100_CONTINUE
-            , _101_SWITCHING_PROTOCOLS
+              Continue100
+            , SwitchingProtocol101
             //=================================
-            , _200_OK
-            , _201_CREATED
-            , _202_ACCEPTED
-            , _203_NON_AUTHORITATIVE_INFORMATION
-            , _204_NO_CONTENT
-            , _205_RESET_CONTENT
-            , _206_PARTIAL_CONTENT
+            , Ok200
+            , Created201
+            , Accepted202
+            , NonAuthoritativeInformation203
+            , NoContent204
+            , ResetContent205
+            , PartialContent206
             //=================================
-            , _300_MULTIPLE_CHOICES
-            , _301_MOVED_PERMANENTLY
-            , _302_MOVED_TEMPORARILY
-            , _303_SEE_OTHER
-            , _304_NOT_MODIFIED
-            , _305_USE_PROXY
+            , MultipleChoices300
+            , MovedPermanently301
+            , MovedTemporarily302
+            , SeeOther303
+            , NotModified304
+            , UseProxy305
             //=================================
-            , _400_BAD_REQUEST
-            , _401_UNAUTHORIZED
-            , _402_PAYMENT_REQUIRED
-            , _403_FORBIDDEN
-            , _404_NOT_FOUND
-            , _405_METHOD_NOT_ALLOWED
-            , _406_NON_ACCEPTABLE
-            , _407_PROXY_AUTHENTICATION_REQUIRED
-            , _408_REQUEST_TIMEOUT
-            , _409_CONFLICT
-            , _410_GONE
-            , _411_LENGTH_REQUIRED
-            , _412_PRECONDITION_FAILED
-            , _413_REQUEST_ENTITY_TOO_LARGE
-            , _414_REQUEST_URI_TOO_LONG
-            , _415_UNSUPPORTED_MEDIA_TYPE
+            , BadRequest400
+            , Unauthorized401
+            , PaymentRequired402
+            , Forbidden403
+            , NotFound404
+            , MethodNotAllowed405
+            , NonAcceptable406
+            , ProxyAuthenticationRequired407
+            , RequestTimeout408
+            , Conflict409
+            , Gone410
+            , LengthRequired
+            , PreconditionFailed412
+            , RequestEntityTooLarge413
+            , RequestUriTooLong414
+            , UnsupportedMediaType415
             //=================================
-            , _500_INTERNAL_SERVER_ERROR
-            , _501_NOT_IMPLEMENTED
-            , _502_BAD_GATEWAY
-            , _503_SERVICE_UNAVAILABLE
-            , _504_GATEWAY_TIMEOUT
-            , _505_HTTP_VERSION_NOT_SUPPORTED
+            , InternalServerError500
+            , NotImplemented501
+            , BadGateway502
+            , ServiceUnavailable503
+            , GatewayTimeout504
+            , HttpVersionNotSupported505
         };
 
     private:
 
         const int UNSET = -1; // for flag responseOfServer_
 
-		std::vector<structOfHeader> responseHeaders_;	// headers of response of server
-		std::string entityBody_;					    // entity body obtained from response of server
+		std::vector<structOfHeader> m_responseHeaders;	// headers of response of server
+		std::string m_entityBody;					    // entity body obtained from response of server
 
-		bool invalidResponse_;						    // flag of validation of response
-        int responseOfServer_;
+		bool m_invalidResponse;						    // flag of validation of response
+        int m_serverResponseCode;
 
         // the class whose objects can create objects of this type
         friend class HttpConnection;
 
         HttpResponse();
-		HttpResponse(const std::string &serverResponse); // in moment of create object must to initialize of response of server
-		void setResponse(const std::string &serverResponse);
+		HttpResponse(const std::string& serverResponse); // in moment of create object must to initialize of response of server
+		void setResponse(const std::string& serverResponse);
 
-		void readChunks(const std::string &entityBody);
+		void readChunks(const std::string& entityBody);
 
-        // sets flags of errors if it detected
-		void detectHttpError(const std::string &checkStr);
+		void determineResponseCode(const std::string& checkStr);
 
 	public:
 
@@ -149,15 +148,14 @@ namespace HttpLib
 
 		/** ****************** getters ****************** **/
 
-        int getCodeOfResponse()             const   { return responseOfServer_; }
-		const std::string &getEntityBody()  const   { return entityBody_;       }
+		int responseCode() const;
+		const std::string &entityBody() const;
 
 		// get all headers as string object like returns HEAD method
-		void getHeaders(std::string &resultHeadersStr) const;
+		void allHeaders(std::string &resultHeadersStr) const;
 
 		// get specified header
-		void getHeader(const std::string &header, std::string &valueOfHeader) const;
-
+		void header(const std::string &header, std::string &valueOfHeader) const;
 	};
 
 }

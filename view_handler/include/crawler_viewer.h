@@ -1,11 +1,13 @@
 #pragma once
 
 #include "stdlibs.h"
+#include "imessage_receiver.h"
 
 namespace ViewHandler
 {
 
 class CrawlerViewer
+	: public CrawlerImpl::IMessageReceiver
 {
 public:
     using size_type = std::deque<std::string>::size_type;

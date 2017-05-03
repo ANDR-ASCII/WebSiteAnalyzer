@@ -34,7 +34,7 @@ void CrawlerBase::addToCrawlQueue(const TagParser& parser, const Url& relativePa
 
 			if (currentUrl.isAbsoluteAddress() && !currentUrl.compareHost(m_host))
 			{
-				if(!existsInQueues(currentUrl, External))
+				if(!existsInQueues(currentUrl, ExternalQueue))
 				{
 					//
 					// TODO: add this warning to the log program
@@ -73,7 +73,7 @@ void CrawlerBase::addToCrawlQueue(const TagParser& parser, const Url& relativePa
 // true if found specified link in specified queue, otherwise false
 bool CrawlerBase::existsInQueues(const Url& url, int queueType)
 {
-	if (queueType == Internal)
+	if (queueType == InternalQueue)
 	{
 		for (const auto& item : m_indexedInternal)
 		{
@@ -94,7 +94,7 @@ bool CrawlerBase::existsInQueues(const Url& url, int queueType)
 		return false;
 	}
 
-	if (queueType == External)
+	if (queueType == ExternalQueue)
 	{
 		for (const auto& item : m_indexedExternal)
 		{
@@ -121,9 +121,9 @@ bool CrawlerBase::existsInQueues(const Url& url, int queueType)
 // add link into specified queue with check on uniqueness
 // if addition into internal queue then adds only relative path.
 // if addition into external queue then adds url.getMainAddress()
-void CrawlerBase::storeLinkToQueue(const Url& url, int whereToSearch)
+void CrawlerBase::storeLinkToQueue(const Url& url, int queueType)
 {
-	if (whereToSearch == Internal)
+	if (queueType == InternalQueue)
 	{
 		if (!existsInQueues(url))
 		{
@@ -132,7 +132,7 @@ void CrawlerBase::storeLinkToQueue(const Url& url, int whereToSearch)
 		return;
 	}
 
-	if (whereToSearch == IndexedIn)
+	if (queueType == InternalIndexedQueue)
 	{
 		if (!existsInQueues(url))
 		{
@@ -141,18 +141,18 @@ void CrawlerBase::storeLinkToQueue(const Url& url, int whereToSearch)
 		return;
 	}
 
-	if (whereToSearch == External)
+	if (queueType == ExternalQueue)
 	{
-		if (!existsInQueues(url, whereToSearch))
+		if (!existsInQueues(url, queueType))
 		{
 			m_externalLinks.push_back(url.host());
 		}
 		return;
 	}
 
-	if (whereToSearch == IndexedEx)
+	if (queueType == ExternalIndexedQueue)
 	{
-		if (!existsInQueues(url, whereToSearch))
+		if (!existsInQueues(url, queueType))
 		{
 			m_indexedExternal.push_back(url.host());
 		}
@@ -162,26 +162,26 @@ void CrawlerBase::storeLinkToQueue(const Url& url, int whereToSearch)
 
 void CrawlerBase::clearQueue(int queueType)
 {
-	if ((queueType & Internal) == Internal)
+	if ((queueType & InternalQueue) == InternalQueue)
 	{
 		m_internalLinks.clear();
 	}
-	if ((queueType & IndexedIn) == IndexedIn)
+	if ((queueType & InternalIndexedQueue) == InternalIndexedQueue)
 	{
 		m_indexedInternal.clear();
 	}
-	if ((queueType & External) == External)
+	if ((queueType & ExternalQueue) == ExternalQueue)
 	{
 		m_externalLinks.clear();
 	}
-	if ((queueType & IndexedEx) == IndexedEx)
+	if ((queueType & ExternalIndexedQueue) == ExternalIndexedQueue)
 	{
 		m_indexedExternal.clear();
 	}
 }
 
 // converts a relative path in accordance with the place where the received address
-std::string CrawlerBase::convertRelativeAddress(const Url& relAddr, const Url& where)
+std::string CrawlerBase::convertRelativeAddress(const Url& relAddr, const Url& urlDestination)
 {
 	// if specified path beginning with slash
 	// it means that specified path is relative by root of website
@@ -191,17 +191,17 @@ std::string CrawlerBase::convertRelativeAddress(const Url& relAddr, const Url& w
 		return relAddr.relativePath();
 	}
 
-	if (relAddr.relativePath().empty() && where.relativeDirectory().empty())
+	if (relAddr.relativePath().empty() && urlDestination.relativeDirectory().empty())
 	{
 		return "/";
 	}
 
 	if (relAddr.relativePath().empty())
 	{
-		return where.relativePath();
+		return urlDestination.relativePath();
 	}
 
-	if (where.relativeDirectory().empty())
+	if (urlDestination.relativeDirectory().empty())
 	{
 		return relAddr.relativePath();
 	}
@@ -215,7 +215,7 @@ std::string CrawlerBase::convertRelativeAddress(const Url& relAddr, const Url& w
 		dirFirst = dividePath(relAddr.relativeDirectory());
 	}
 
-	dirSecond = dividePath(where.relativeDirectory());
+	dirSecond = dividePath(urlDestination.relativeDirectory());
 
 	std::size_t sizeFirst = dirFirst.size();
 	std::size_t sizeSecond = dirSecond.size();

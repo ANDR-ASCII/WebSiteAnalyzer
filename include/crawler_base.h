@@ -11,15 +11,28 @@ namespace CrawlerImpl
 using namespace HtmlParser;
 using namespace HttpLib;
 
+//!
+//! This class manages internal crawler queues of links.
+//! It contain 4 queues.
+//!
+//! 1. Internal links queue
+//! 2. Indexed internal links queue
+//! 3. External links queue
+//! 4. External indexed links
+//!
+//! In internal links queue and indexed internal links queue it saves only
+//! relative path of links and they must be starts with slash character '/'.
+//!
+
 class CrawlerBase
 {
 public:
 	enum QueueType
 	{
-		Internal,
-		External = 2,
-		IndexedIn = 4,
-		IndexedEx = 8
+		InternalQueue = 1 << 0,
+		ExternalQueue = 1 << 1,
+		InternalIndexedQueue = 1 << 2,
+		ExternalIndexedQueue = 1 << 3
 	};
 
 	// the second argument is expected
@@ -27,21 +40,18 @@ public:
 	void addToCrawlQueue(const TagParser& parser, const Url& relativePath);
 
 	// finds link in indexed and internal queues
-	bool existsInQueues(const Url& url, int queueType = Internal);
+	bool existsInQueues(const Url& url, int queueType = InternalQueue);
 
 	// add link into specified queue with check on uniqueness
 	// if addition into internal queue then adds only relative path.
 	// if addition into external queue then adds subdomain + host
-	void storeLinkToQueue(const Url& url, int whereToSearch);
+	void storeLinkToQueue(const Url& url, int queueType);
 
-	// the flags you can pass through |. Old of C method.
 	void clearQueue(int queueType);
-
-	/** API for conversion true relative addresses **/
 
 	// converts the relative path in accordance with the address where the received link
 	// expects that second parameter is set by the website root
-	std::string convertRelativeAddress(const Url& relAddr, const Url& where);
+	std::string convertRelativeAddress(const Url& relAddr, const Url& urlDestination);
 
 	// divides path by folders
 	// expects path following [/]aaa/[bbb/[page.php[?var1=val&var2=val]]]

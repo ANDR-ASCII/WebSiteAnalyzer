@@ -86,7 +86,6 @@ namespace HtmlParser
         }
     };
 
-
 	class Url
 	{
     public:
@@ -141,6 +140,9 @@ namespace HtmlParser
 		// returns value of variable by number 'variableNumber' if success
         // otherwise returns empty string
 		std::string variableValue(std::size_t variableNumber);
+
+		Url mergeRelativePaths(const Url& url, const Url& urlDestination) const;
+		std::vector<std::string> dividePath(const std::string& path) const;
 
         // check the status link
 		bool isAnchor() const;
@@ -226,5 +228,17 @@ namespace HtmlParser
         // also it need for compare relative link such a - index.html
         // because such a relative link matched for "statPtnAbsoluteLink"
         bool isExtensionMatchWebPage(const std::string& extension);
+	};
+
+	template <typename Key>
+	struct UrlHash;
+
+	template <>
+	struct UrlHash<Url>
+	{
+		std::size_t operator()(const Url& key) const
+		{
+			return std::hash<std::string>()(key.host() + key.relativePath());
+		}
 	};
 }

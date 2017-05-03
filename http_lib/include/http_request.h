@@ -20,7 +20,7 @@ namespace HttpLib
 	public:
 		enum class Method { Get, Post, Head };
 		enum class ConnectionType { KeepAlive, Close };
-		enum class Version { V_1_0, V_1_1 };
+		enum class Version { Version1_0, Version1_1 };
 
 		HttpRequest();
 		HttpRequest(const HttpRequest &copyRequest);

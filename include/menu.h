@@ -2,8 +2,10 @@
 
 #include "stdlibs.h"
 #include "console_crawler_viewer.h"
-#include "Crawler.h"
 #include "url.h"
+#include "crawler_model.h"
+#include "crawler_controller.h"
+#include "crawler_settings.h"
 
 #define MEASURE_OF_TIME " milliseconds"
 
@@ -56,7 +58,11 @@ namespace UserInterface
         bool turnOnOffSearchInSE = false;
 
         ViewHandler::ConsoleCrawlerViewer ccv;
-        CrawlerImpl::Crawler crawl;
+        //CrawlerImpl::Crawler crawl;
+
+		CrawlerImpl::CrawlerModel m_model;
+		CrawlerImpl::CrawlerSettings m_settings;
+		CrawlerImpl::CrawlerController m_controller;
 
 		HtmlParser::Url startLnk;
 

@@ -7,7 +7,11 @@ const boost::regex UserInterface::Menu::getNumbers("^\\s*\\d+(?:\\s*,\\s*\\d+)*$
 
 UserInterface::Menu::Menu()
 {
-    crawl.setViewer(&ccv);
+    //crawl.setViewer(&ccv);
+	m_controller.setSettings(&m_settings);
+	m_controller.setModel(&m_model);
+	m_controller.addReceiver(&ccv);
+
     printMenu();
     interrogation();
 }
@@ -133,12 +137,12 @@ void UserInterface::Menu::start()
     string ready;
 
     cout << "\nCrawler will be started with configurations:\n\n"
-            "Start address: " << crawl.getStartAddress() << endl <<
-            "User-Agent: " << crawl.getSignature() << endl <<
-            "Pause time: " << crawl.getTimePause() << MEASURE_OF_TIME << endl <<
-            "Max Depth: " << crawl.getMaxDepth() << " links" << endl;
+            "Start address: " << m_settings.startUrlAddress().host() << endl <<
+            "User-Agent: " << m_settings.signature() << endl <<
+            "Pause time: " << m_settings.requestPause().count() << MEASURE_OF_TIME << endl <<
+            "Max Depth: " << m_settings.maxCrawlLinks() << " links" << endl;
 
-    if (crawl.getModeInfiniteCrawl())
+    if (m_settings.infiniteCrawling())
     {
         cout << "Infinite crawl mode turned on.\n";
     }
@@ -150,7 +154,7 @@ void UserInterface::Menu::start()
     cout << "\nCase-insensitive 'q', 'quit' - exit from program\n"
             "Case-insensitive 'r', 'ret', 'return' - return to menu\n";
 
-    if (crawl.readyForStart())
+    if (m_settings.readyForStart())
     {
         cout << "After starting will not be able to stop the program until it is finished.\n\nRun?(y/n): ";
 
@@ -180,7 +184,7 @@ void UserInterface::Menu::start()
 
             if (Common::strToLower(ready) == "y")
             {
-                crawl.start();
+                m_controller.startCrawling();
                 break;
             }
         }
@@ -246,7 +250,7 @@ void UserInterface::Menu::setStartAddress()
     }
 
     cout << "Start address was set. \n";
-    crawl.setStartAddress(address);
+	m_settings.setHost(address);
 }
 
 void UserInterface::Menu::setPauseBetweenReqs()
@@ -297,7 +301,8 @@ void UserInterface::Menu::setPauseBetweenReqs()
     }
 
     cout << "Pause time equal " << timePause << MEASURE_OF_TIME " was set.\n";
-    crawl.setPause(timePause);
+
+	m_settings.setRequestPause(std::chrono::milliseconds(timePause));
 }
 
 void UserInterface::Menu::setUserAgent()
@@ -330,7 +335,8 @@ void UserInterface::Menu::setUserAgent()
     }
 
     cout << "Signature: '" << signature << "' was set.\n";
-    crawl.setSignature(signature);
+
+	m_settings.setSignature(signature);
 }
 
 void UserInterface::Menu::setMaxDepth()
@@ -374,7 +380,8 @@ void UserInterface::Menu::setMaxDepth()
     }
 
     cout << "Max depth equal " << depth << " links was set.\n";
-    crawl.setMaxDepth(depth);
+
+	m_settings.setMaxCrawlLinks(depth);
 }
 
 void UserInterface::Menu::switchInfiniteMode()
@@ -391,7 +398,9 @@ void UserInterface::Menu::switchInfiniteMode()
         cout << "Infinite crawl mode turned off.\n";
     }
 
-    crawl.setModeInfiniteCrawl(turnOnOffInfCrawl);
+    //crawl.setModeInfiniteCrawl(turnOnOffInfCrawl);
+
+	m_settings.setInfiniteCrawling(turnOnOffInfCrawl);
 }
 
 void UserInterface::Menu::setPathToSave()
@@ -424,5 +433,5 @@ void UserInterface::Menu::setPathToSave()
     }
 
     cout << "Path: '" << path << "' was set.\n";
-    crawl.setPathToSavePages(path);
+    //crawl.setPathToSavePages(path);
 }

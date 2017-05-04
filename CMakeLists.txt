@@ -5,6 +5,7 @@ set(BINARY web_site_indexer)
 # .lib names
 set(HTMLPARSER_LIB_NAME html_parser)
 set(HTTP_LIB_NAME http_lib)
+set(GUMBO_PARSER_LIB_NAME gumbo)
 
 # change it if you want to build project on Linux
 set(NETWORKING_WINDOWS_LIB_NAME ws2_32)
@@ -24,12 +25,15 @@ set(VIEWHANDLER_SOURCES_DIR view_handler/src)
 set(HTMLPARSER_LIB_HEADERS_DIR html_parser/include)
 set(HTTP_LIB_HEADERS_DIR http_lib/include)
 
+set(GUMBO_HEADERS_DIR gumbo_parser/src)
+
 # prepare headers directories and sources list
 set(ALL_HEADERS_DIRS 
 	${BINARY_HEADERS_DIR} 
 	${HTMLPARSER_LIB_HEADERS_DIR}
 	${HTTP_LIB_HEADERS_DIR} 
 	${VIEWHANDLER_HEADERS_DIR}
+	${GUMBO_HEADERS_DIR}
 )
 
 aux_source_directory(${BINARY_SOURCES_DIR} BINARY_SOURCES_LIST)
@@ -50,7 +54,7 @@ set(ALL_HEADERS
 
 # Boost dependencies
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost 1.59.0 COMPONENTS regex)
+find_package(Boost 1.64.0 COMPONENTS regex)
 
 # this project depends of all subprojects
 include_directories(
@@ -59,12 +63,15 @@ include_directories(
 )
 
 # add macro definitions for Visual Studio
-add_definitions(
-	/D _WINSOCK_DEPRECATED_NO_WARNINGS
-)
+if(MSVC)
+	add_definitions(
+		/D _WINSOCK_DEPRECATED_NO_WARNINGS
+	)
+endif()
 
 add_subdirectory(${HTMLPARSER_LIB_NAME})
 add_subdirectory(${HTTP_LIB_NAME})
+add_subdirectory(${GUMBO_PARSER_LIB_NAME})
 
 add_executable(
 	${BINARY} 
@@ -77,4 +84,5 @@ target_link_libraries(
 	${Boost_LIBRARIES} 
 	${HTMLPARSER_LIB_NAME}
 	${HTTP_LIB_NAME}
+	${GUMBO_PARSER_LIB_NAME}
 )

@@ -18,7 +18,8 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			currentUrl.parse(tag.attribute("href"));
 
-			if (currentUrl.fileType() != Url::FileType::ExecutableWebFile ||
+			if (!currentUrl.file().empty() && 
+				currentUrl.fileType() != Url::FileType::ExecutableWebFile ||
 				currentUrl.isAnchor())
 			{
 				continue;
@@ -26,13 +27,13 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			if (currentUrl.isAbsoluteAddress() && !currentUrl.compareHost(hostUrl))
 			{
-				if (currentUrl.protocol() != "https://")
+				if (currentUrl.protocol() == "https://")
 				{
 					sendMessage(httpsWarning);
 					continue;
 				}
 
-				if (m_externalCrawledUrlQueue.find(currentUrl) != std::end(m_externalCrawledUrlQueue))
+				if (m_externalCrawledUrlQueue.find(currentUrl) == std::end(m_externalCrawledUrlQueue))
 				{
 					m_externalUrlQueue.emplace(currentUrl.host());
 
@@ -44,13 +45,13 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			if (currentUrl.isAbsoluteAddress() && currentUrl.compareHost(hostUrl))
 			{
-				if (currentUrl.protocol() != "https://")
+				if (currentUrl.protocol() == "https://")
 				{
 					sendMessage(httpsWarning);
 					continue;
 				}
 
-				if (m_internalCrawledUrlQueue.find(currentUrl) != std::end(m_internalCrawledUrlQueue))
+				if (m_internalCrawledUrlQueue.find(currentUrl) == std::end(m_internalCrawledUrlQueue))
 				{
 					m_internalUrlQueue.emplace(currentUrl.relativePath());
 
@@ -67,7 +68,7 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			Url url = currentUrl.mergeRelativePaths(currentUrl, containingUrl);
 
-			if (m_internalCrawledUrlQueue.find(currentUrl) == std::end(m_internalCrawledUrlQueue))
+			if (m_internalCrawledUrlQueue.find(url.relativePath()) == std::end(m_internalCrawledUrlQueue))
 			{
 				m_internalUrlQueue.emplace(url.relativePath());
 
@@ -85,7 +86,7 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 void CrawlerModel::storeUrl(const Url& url, int queueType)
 {
-	queue(queueType)->emplace(url);
+	queue(queueType)->emplace(queueType == InternalUrlQueue ? url.relativePath() : url);
 }
 
 CrawlerModel::SmartModelElementPtr CrawlerModel::anyUrl(int queueType)

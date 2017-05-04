@@ -33,7 +33,7 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 					continue;
 				}
 
-				if (m_externalCrawledUrlQueue.find(currentUrl) == std::end(m_externalCrawledUrlQueue))
+				if (!isItemExistsIn(currentUrl, ExternalCrawledUrlQueue))
 				{
 					m_externalUrlQueue.emplace(currentUrl.host());
 
@@ -51,9 +51,9 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 					continue;
 				}
 
-				if (m_internalCrawledUrlQueue.find(currentUrl) == std::end(m_internalCrawledUrlQueue))
+				if (!isItemExistsIn(currentUrl, InternalCrawledUrlQueue))
 				{
-					m_internalUrlQueue.emplace(currentUrl.relativePath());
+					queue(InternalUrlQueue)->emplace(currentUrl.relativePath());
 
 					sendMessage(QueueItersAndRefsInvalidatedMessage{ InternalUrlQueue });
 				}
@@ -68,9 +68,9 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			Url url = currentUrl.mergeRelativePaths(currentUrl, containingUrl);
 
-			if (m_internalCrawledUrlQueue.find(url.relativePath()) == std::end(m_internalCrawledUrlQueue))
+			if (!isItemExistsIn(url, InternalCrawledUrlQueue))
 			{
-				m_internalUrlQueue.emplace(url.relativePath());
+				queue(InternalUrlQueue)->emplace(url.relativePath());
 
 				sendMessage(QueueItersAndRefsInvalidatedMessage{ InternalUrlQueue });
 			}
@@ -86,7 +86,23 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 void CrawlerModel::storeUrl(const Url& url, int queueType)
 {
-	queue(queueType)->emplace(queueType == InternalUrlQueue ? url.relativePath() : url);
+	const bool isInternalQueueType =
+		queueType == InternalUrlQueue ||
+		queueType == InternalCrawledUrlQueue;
+
+	queue(queueType)->emplace(isInternalQueueType ? url.relativePath() : url.host());
+}
+
+bool CrawlerModel::isItemExistsIn(const Url& url, int queueType) const
+{
+	const bool isInternalQueueType =
+		queueType == InternalUrlQueue ||
+		queueType == InternalCrawledUrlQueue;
+
+	Queue::iterator endIter = std::end(*queue(queueType));
+	Queue::iterator findIter = queue(queueType)->find(isInternalQueueType ? url.relativePath() : url.host());
+
+	return findIter != endIter;
 }
 
 CrawlerModel::SmartModelElementPtr CrawlerModel::anyUrl(int queueType)
@@ -105,11 +121,32 @@ std::size_t CrawlerModel::size(int queueType) const noexcept
 
 CrawlerModel::SmartModelElementPtr CrawlerModel::moveUrl(const Url& urlKey, int fromQueueType, int toQueueType)
 {
+	const bool isFromQueueTypeInternal =
+		fromQueueType == InternalUrlQueue ||
+		fromQueueType == InternalCrawledUrlQueue;
+
+	const bool isFromQueueTypeExternal =
+		fromQueueType == ExternalUrlQueue ||
+		fromQueueType == ExternalCrawledUrlQueue;
+
+	const bool isToQueueTypeInternal =
+		toQueueType == InternalUrlQueue ||
+		toQueueType == InternalCrawledUrlQueue;
+
+	const bool isToQueueTypeExternal =
+		toQueueType == ExternalUrlQueue ||
+		toQueueType == ExternalCrawledUrlQueue;
+
+	assert(isFromQueueTypeInternal ? 
+		isToQueueTypeInternal : 
+		isFromQueueTypeExternal && isToQueueTypeExternal
+	);
+
 	Queue::iterator iter = queue(fromQueueType)->find(urlKey);
 
 	assert(iter != std::end(*queue(fromQueueType)));
 
-	std::pair<Queue::iterator, bool> insertionResult = 
+	std::pair<Queue::iterator, bool> insertionResult =
 		queue(toQueueType)->emplace(std::move(*iter));
 
 	queue(fromQueueType)->erase(iter);

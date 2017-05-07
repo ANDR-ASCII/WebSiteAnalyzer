@@ -1,4 +1,4 @@
-# web_site_indexer
+# WebSiteAnalyzer
 
 This program will help to determine the next errors from web sites:
 

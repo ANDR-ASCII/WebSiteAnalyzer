@@ -10,12 +10,10 @@ set(CommonLibName Common)
 set(CrawlerLibName Crawler)
 set(HtmlParserLibName HtmlParser)
 set(HttpLibName HttpLib)
-set(GumboLibName Gumbo)
 
 # change it if you want to build project on Linux or MAC OS
 set(NetworkOSLibName ws2_32)
 
-add_subdirectory(${GumboLibName})
 add_subdirectory(${CommonLibName})
 add_subdirectory(${CrawlerLibName})
 add_subdirectory(${GuiBinName})

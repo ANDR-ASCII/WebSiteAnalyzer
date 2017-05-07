@@ -429,7 +429,7 @@ std::deque<HtmlParser::Tag> const& TagParserPrivate::internalTagStorage() const
 bool TagParserPrivate::isSetTagAttributes(const std::string& tagString) const
 {
 	const std::size_t idx = tagString.find(s_equalCharacter);
-	auto i = 0ul;
+	std::size_t i = 0;
 
 	if (idx != std::string::npos)
 	{

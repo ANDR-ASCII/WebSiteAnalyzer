@@ -453,10 +453,11 @@ bool Url::isExtensionMatchWebPage(const std::string &extension)
 }
 
 // true if specify variable exists otherwise false
-int Url::isSetVariable(const std::string &nameOfVar)
+std::size_t Url::isSetVariable(const std::string &nameOfVar)
 {
-	auto size = m_variables.size();
-	for (decltype(size) i = 0; i < size; ++i)
+	std::size_t size = m_variables.size();
+
+	for (std::size_t i = 0; i < size; ++i)
 	{
 		if (m_variables[i].first == nameOfVar)
 		{

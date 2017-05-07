@@ -128,7 +128,7 @@ namespace HtmlParser
 
         // returns number of element in vector of variables
         // if specify var was found, otherwise -1
-		int isSetVariable(const std::string& nameOfVar);
+		std::size_t isSetVariable(const std::string& nameOfVar);
 
 		// set flag for determine content type based on file
 		void determineContentType(bool parseFileCategory);

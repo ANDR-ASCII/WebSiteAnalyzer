@@ -1,4 +1,3 @@
-#include "headers.h"
 #include "common.h"
 
 namespace Common
@@ -75,9 +74,9 @@ std::string cutSpaceChars(std::string& workStr)
 std::string strToLower(const std::string& toLowStr)
 {
 	std::string resultStr;
-	int size = toLowStr.size();
+	std::size_t size = toLowStr.size();
 
-	for (int i = 0; i < size; ++i)
+	for (std::size_t i = 0; i < size; ++i)
 	{
 		resultStr += static_cast<char>(tolower((unsigned char)toLowStr[i]));
 	}

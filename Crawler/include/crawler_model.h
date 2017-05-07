@@ -60,6 +60,8 @@ public:
 
 	void storeUrl(const Url& url, int queueType);
 
+	bool isItemExistsIn(const Url& url, int queueType) const;
+
 	//!
 	//! Value from this function may invalidate
 	//! After any change model operation

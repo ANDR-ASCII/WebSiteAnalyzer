@@ -1,11 +1,15 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.11)
 
-project(${GUMBO_PARSER_LIB_NAME} C)
+project(${GumboLibName})
 
 aux_source_directory(./ GUMBO_SOURCES)
 file(GLOB_RECURSE GUMBO_HEADERS "./*.h")
 
-add_library(${GUMBO_PARSER_LIB_NAME} STATIC ${GUMBO_SOURCES} ${GUMBO_HEADERS})
+add_library(
+	${GumboLibName} STATIC 
+	${GUMBO_SOURCES} 
+	${GUMBO_HEADERS}
+)
 
 if(MSVC)
 

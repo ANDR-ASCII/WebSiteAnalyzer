@@ -9,9 +9,11 @@ set(CrawlerLibHeadersDir include)
 set(HtmlParserLibHeadersDir ../HtmlParser/include)
 set(HttpLibHeadersDir ../HttpLib/include)
 set(CommonLibHeadersDir ../Common/include)
+set(GumboLibHeadersDir ../Gumbo/include)
 
 # prepare headers directories and sources list
 set(AllHeadersDir
+	${GumboLibHeadersDir}
 	${CrawlerLibHeadersDir} 
 	${HtmlParserLibHeadersDir}
 	${CommonLibHeadersDir}
@@ -49,4 +51,5 @@ target_link_libraries(
 	${CommonLibName}
 	${HtmlParserLibName}
 	${HttpLibName}
+	${GumboLibName}
 )

@@ -32,6 +32,10 @@
 #include "util.h"
 #include "vector.h"
 
+#pragma warning(push)
+#pragma warning(disable:4267)
+#pragma warning(disable:4244)
+
 #define AVOID_UNUSED_VARIABLE_WARNING(i) (void)(i)
 
 #define GUMBO_STRING(literal) \
@@ -4190,3 +4194,5 @@ void gumbo_destroy_output(const GumboOptions* options, GumboOutput* output) {
   gumbo_vector_destroy(&parser, &output->errors);
   gumbo_parser_deallocate(&parser, output);
 }
+
+#pragma warning(pop)

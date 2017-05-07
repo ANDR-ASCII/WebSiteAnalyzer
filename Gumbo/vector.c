@@ -23,6 +23,10 @@
 
 #include "util.h"
 
+#pragma warning(push)
+#pragma warning(disable:4267)
+#pragma warning(disable:4244)
+
 struct GumboInternalParser;
 
 const GumboVector kGumboEmptyVector = {NULL, 0, 0};
@@ -121,3 +125,5 @@ void* gumbo_vector_remove_at(struct GumboInternalParser* parser,
   --vector->length;
   return result;
 }
+
+#pragma warning(pop)

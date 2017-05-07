@@ -37,6 +37,10 @@
 #include "utf8.h"
 #include "util.h"
 
+#pragma warning(push)
+#pragma warning(disable:4267)
+#pragma warning(disable:4244)
+
 struct GumboInternalParser;
 
 const int kGumboNoChar = -1;
@@ -23067,3 +23071,5 @@ bool consume_char_ref(struct GumboInternalParser* parser,
       return consume_named_ref(parser, input, is_in_attribute, output);
   }
 }
+
+#pragma warning(pop)

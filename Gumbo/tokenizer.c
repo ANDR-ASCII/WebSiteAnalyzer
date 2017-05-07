@@ -61,6 +61,10 @@
 #include "util.h"
 #include "vector.h"
 
+#pragma warning(push)
+#pragma warning(disable:4267)
+#pragma warning(disable:4244)
+
 // Compared against _script_data_buffer to determine if we're in double-escaped
 // script mode.
 const GumboStringPiece kScriptTag = {"script", 6};
@@ -2895,3 +2899,5 @@ void gumbo_token_destroy(GumboParser* parser, GumboToken* token) {
       return;
   }
 }
+
+#pragma warning(pop)

@@ -27,6 +27,10 @@
 #include "util.h"
 #include "vector.h"
 
+#pragma warning(push)
+#pragma warning(disable:4267)
+#pragma warning(disable:4244)
+
 const int kUtf8ReplacementChar = 0xFFFD;
 
 // Reference material:
@@ -268,3 +272,5 @@ void utf8iterator_fill_error_at_mark(Utf8Iterator* iter, GumboError* error) {
   error->position = iter->_mark_pos;
   error->original_text = iter->_mark;
 }
+
+#pragma warning(pop)

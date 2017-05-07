@@ -20,6 +20,8 @@
 #include <ctype.h>
 #include <string.h>
 
+#pragma warning(disable:4267)
+
 const char* kGumboTagNames[] = {
 #include "tag_strings.h"
     "",  // TAG_UNKNOWN

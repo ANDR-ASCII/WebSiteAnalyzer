@@ -27,6 +27,10 @@
 #include "util.h"
 #include "vector.h"
 
+#pragma warning(push)
+#pragma warning(disable:4267)
+#pragma warning(disable:4244)
+
 // Prints a formatted message to a StringBuffer.  This automatically resizes the
 // StringBuffer as necessary to fit the message.  Returns the number of bytes
 // written.
@@ -277,3 +281,5 @@ void gumbo_destroy_errors(GumboParser* parser) {
   }
   gumbo_vector_destroy(parser, &parser->_output->errors);
 }
+
+#pragma warning(pop)

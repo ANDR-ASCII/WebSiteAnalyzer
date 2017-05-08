@@ -18,7 +18,7 @@ void CrawlerSettings::setSignature(const std::string& signature)
 	m_signature = signature;
 }
 
-void CrawlerSettings::setMaxCrawlLinks(std::size_t value) noexcept
+void CrawlerSettings::setMaxCrawlUrls(std::size_t value) noexcept
 {
 	m_maxCrawlLinks = value;
 }

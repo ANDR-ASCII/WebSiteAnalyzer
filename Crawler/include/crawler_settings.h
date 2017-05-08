@@ -14,7 +14,7 @@ public:
 	void setHost(const Url& url);
 	void setRequestPause(std::chrono::milliseconds pause) noexcept;
 	void setSignature(const std::string& signature);
-	void setMaxCrawlLinks(std::size_t value) noexcept;
+	void setMaxCrawlUrls(std::size_t value) noexcept;
 	void setInfiniteCrawling(bool value) noexcept;
 
 	const Url& startUrlAddress() const noexcept;

@@ -1,29 +1,189 @@
-<UI version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MainFrameClass</class>
- <widget class="QMainWindow" name="MainFrameClass" >
-  <property name="objectName" >
-   <string notr="true">MainFrameClass</string>
-  </property>
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainFrameClass">
+  <property name="geometry">
    <rect>
-	<x>0</x>
-	<y>0</y>
-	<width>600</width>
-	<height>400</height>
+    <x>0</x>
+    <y>0</y>
+    <width>1038</width>
+    <height>556</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>MainFrame</string>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QTabWidget" name="infoWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="crawlerTab">
+        <attribute name="title">
+         <string>Краулер</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QToolButton" name="startCrawlerButton">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QToolButton" name="stopCrawlerButton">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>931</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="0" colspan="3">
+          <widget class="QTableView" name="crawlerTableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="externalUrlsTab">
+        <attribute name="title">
+         <string>Внешние ссылки</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QTableView" name="externalUrlsTableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="pages404Tab">
+        <attribute name="title">
+         <string>Ошибки 404</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QTableView" name="pages404TableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="recurseRedirectsTab">
+        <attribute name="title">
+         <string>Рекурсивные редиректы</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QTableView" name="recurseRedirectsTableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="titleDuplicatesTab">
+        <attribute name="title">
+         <string>Дубли Title</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="QTableView" name="titleDuplicatesTableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="descriptionDuplicatesTab">
+        <attribute name="title">
+         <string>Дубли Description</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QTableView" name="descriptionDuplicatesTableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="missingTitleTab">
+        <attribute name="title">
+         <string>Отсутствие/Пустота Title</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="QTableView" name="missingTitleTableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="missingDescriptionTab">
+        <attribute name="title">
+         <string>Отсутствие/Пустота Description</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <widget class="QTableView" name="missingDescriptionTableView"/>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QTextEdit" name="logInfo">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>180</height>
+        </size>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1038</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="action"/>
+    <addaction name="action_2"/>
+    <addaction name="separator"/>
+   </widget>
+   <addaction name="menu"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="action">
+   <property name="text">
+    <string>Сохранить</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>Сохранить как</string>
+   </property>
+  </action>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources>
-   <include location="main_frame.qrc"/>
+  <include location="../rcc/main_frame.qrc"/>
  </resources>
  <connections/>
-</UI>
+</ui>

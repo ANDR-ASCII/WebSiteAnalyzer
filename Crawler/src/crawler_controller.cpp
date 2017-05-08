@@ -47,28 +47,29 @@ void CrawlerController::startCrawling()
 
 	while (true)
 	{
-		CrawlerModel::SmartModelElementPtr url = 
-			model()->anyUrl(CrawlerModel::InternalUrlQueue);
+		if (model()->queue(CrawlerModel::InternalUrlQueue)->empty())
+		{
+			return;
+		}
 
-		url = model()->moveUrl(*url->value(), CrawlerModel::InternalUrlQueue, CrawlerModel::InternalCrawledUrlQueue);
+		Url url = model()->queue(CrawlerModel::InternalUrlQueue)->front();
+
+		model()->queue(CrawlerModel::InternalCrawledUrlQueue)->push_back(url);
+		model()->queue(CrawlerModel::InternalUrlQueue)->pop_front();
 
 		std::this_thread::sleep_for(settings()->requestPause());
 
-		sendMessage(CurrentRequestedUrlMessage{ settings()->startUrlAddress().host() + url->value()->relativePath() });
+		sendMessage(CurrentRequestedUrlMessage{ settings()->startUrlAddress().host() + url.relativePath() });
 		sendMessage(QueueSizeMessage{ CrawlerModel::InternalUrlQueue, model()->size(CrawlerModel::InternalUrlQueue) });
 		sendMessage(QueueSizeMessage{ CrawlerModel::InternalCrawledUrlQueue, model()->size(CrawlerModel::InternalCrawledUrlQueue) });
 		sendMessage(QueueSizeMessage{ CrawlerModel::ExternalUrlQueue, model()->size(CrawlerModel::ExternalUrlQueue) });
 
-		request.setRelativePath(url->value()->relativePath());
+		request.setRelativePath(url.relativePath());
 		request.build();
 		response = httpConnection.openUrl(request);
 
 		if (!response->isValid())
 		{
-			//
-			// TODO: handle this error at the start crawling
-			//
-
 			sendMessage(WarningMessage{ "Invalid response of server" });
 			continue;
 		}
@@ -81,7 +82,12 @@ void CrawlerController::startCrawling()
 		else
 		{
 			tagParser.parseTags(response->entityBody(), "a");
-			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), *url->value());
+
+			//
+			// TODO: remove from tagParser all HTTPS urls
+			//
+
+			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), url);
 		}
 
 		sendMessage(HttpResponseCodeMessage{ response->responseCode() });

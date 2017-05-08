@@ -27,7 +27,8 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			if (currentUrl.isAbsoluteAddress() && !currentUrl.compareHost(hostUrl))
 			{
-				if (!isItemExistsIn(currentUrl, ExternalCrawledUrlQueue))
+				if (!isItemExistsIn(currentUrl, ExternalCrawledUrlQueue) &&
+					!isItemExistsIn(currentUrl, ExternalUrlQueue))
 				{
 					m_externalUrlQueue.push_back(currentUrl.host());
 				}
@@ -37,7 +38,8 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			if (currentUrl.isAbsoluteAddress() && currentUrl.compareHost(hostUrl))
 			{
-				if (!isItemExistsIn(currentUrl, InternalCrawledUrlQueue))
+				if (!isItemExistsIn(currentUrl, InternalCrawledUrlQueue) &&
+					!isItemExistsIn(currentUrl, InternalUrlQueue))
 				{
 					queue(InternalUrlQueue)->push_back(currentUrl.relativePath());
 				}
@@ -52,7 +54,8 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			Url url = currentUrl.mergeRelativePaths(currentUrl, containingUrl);
 
-			if (!isItemExistsIn(url, InternalCrawledUrlQueue))
+			if (!isItemExistsIn(url, InternalCrawledUrlQueue) &&
+				!isItemExistsIn(url, InternalUrlQueue))
 			{
 				queue(InternalUrlQueue)->push_back(url.relativePath());
 			}

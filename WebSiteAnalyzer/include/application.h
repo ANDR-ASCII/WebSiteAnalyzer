@@ -1,10 +1,9 @@
 #pragma once
 
+#include "stdlibs.h"
 #include "main_frame.h"
-#include <memory>
-#include <QtWidgets/QApplication>
 
-namespace WebSiteIndexer
+namespace WebSiteAnalyzer
 {
 
 class Application

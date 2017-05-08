@@ -1,6 +1,6 @@
 #include "application.h"
 
-namespace WebSiteIndexer
+namespace WebSiteAnalyzer
 {
 
 Application::Application(int argc, char** argv)

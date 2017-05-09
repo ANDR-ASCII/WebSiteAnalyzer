@@ -20,6 +20,7 @@ public:
 	MainFrame(CrawlerImpl::CrawlerModel* model, QWidget *parent = 0);
 
 	Q_SIGNAL void signal_startCrawling(CrawlerImpl::CrawlerSettings* settings);
+	Q_SIGNAL void signal_stopCrawlerCommand();
 	Q_SLOT void slot_showStartSettingsDialog();
 	Q_SLOT void slot_modelUpdated();
 	Q_SLOT void slot_warningMessage(const std::string&);

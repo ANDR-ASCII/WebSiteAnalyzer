@@ -11,6 +11,7 @@
 // C++
 #include <memory>
 #include <thread>
+#include <condition_variable>
 
 #ifndef NDEBUG
 

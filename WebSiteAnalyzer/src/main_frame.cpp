@@ -15,7 +15,8 @@ MainFrame::MainFrame(CrawlerImpl::CrawlerModel* model, QWidget *parent)
 
 	ui.crawlerListView->setModel(m_crawlerModel.get());
 
-	connect(ui.startCrawlerButton, SIGNAL(clicked()), SLOT(slot_showStartSettingsDialog()));
+	VERIFY(connect(ui.startCrawlerButton, SIGNAL(clicked()), SLOT(slot_showStartSettingsDialog())));
+	VERIFY(connect(ui.stopCrawlerButton, SIGNAL(clicked()), SIGNAL(signal_stopCrawlerCommand())));
 }
 
 void MainFrame::slot_showStartSettingsDialog()

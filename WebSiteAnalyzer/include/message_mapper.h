@@ -16,6 +16,7 @@ class MessageMapper
 public:
 	Q_SIGNAL void signal_modelUpdated();
 	Q_SIGNAL void signal_warningMessage(const std::string&);
+	Q_SIGNAL void signal_crawlerStopped();
 
 protected:
 	virtual void receiveMessage(const CrawlerImpl::IMessage& message) override;

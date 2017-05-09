@@ -32,7 +32,7 @@ CrawlerImpl::CrawlerSettings* CrawlerController::settings() const
 	return m_settings;
 }
 
-void CrawlerController::startCrawling()
+void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 {
 	TagParser tagParser;
 	HttpConnection httpConnection;
@@ -45,7 +45,7 @@ void CrawlerController::startCrawling()
 	request.setHttpVersion(HttpRequest::Version::Version1_1);
 	request.setConnectionType(HttpRequest::ConnectionType::Close);
 
-	while (true)
+	while (stopCrawling == false)
 	{
 		if (model()->queue(CrawlerModel::InternalUrlQueue)->empty())
 		{
@@ -54,7 +54,9 @@ void CrawlerController::startCrawling()
 
 		Url url = model()->queue(CrawlerModel::InternalUrlQueue)->front();
 
-		model()->queue(CrawlerModel::InternalCrawledUrlQueue)->push_back(url);
+		model()->storeUrl(url, CrawlerModel::InternalCrawledUrlQueue);
+		//model()->queue(CrawlerModel::InternalCrawledUrlQueue)->push_back(url);
+
 		model()->queue(CrawlerModel::InternalUrlQueue)->pop_front();
 
 		std::this_thread::sleep_for(settings()->requestPause());

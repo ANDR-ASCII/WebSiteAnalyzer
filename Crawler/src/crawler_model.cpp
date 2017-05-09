@@ -30,7 +30,8 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 				if (!isItemExistsIn(currentUrl, ExternalCrawledUrlQueue) &&
 					!isItemExistsIn(currentUrl, ExternalUrlQueue))
 				{
-					m_externalUrlQueue.push_back(currentUrl.host());
+					//m_externalUrlQueue.push_back(currentUrl.host());
+					storeUrl(currentUrl, ExternalUrlQueue);
 				}
 
 				continue;
@@ -41,7 +42,8 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 				if (!isItemExistsIn(currentUrl, InternalCrawledUrlQueue) &&
 					!isItemExistsIn(currentUrl, InternalUrlQueue))
 				{
-					queue(InternalUrlQueue)->push_back(currentUrl.relativePath());
+					//queue(InternalUrlQueue)->push_back(currentUrl.relativePath());
+					storeUrl(currentUrl, InternalUrlQueue);
 				}
 
 				continue;
@@ -57,7 +59,8 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 			if (!isItemExistsIn(url, InternalCrawledUrlQueue) &&
 				!isItemExistsIn(url, InternalUrlQueue))
 			{
-				queue(InternalUrlQueue)->push_back(url.relativePath());
+				//queue(InternalUrlQueue)->push_back(url.relativePath());
+				storeUrl(url, InternalUrlQueue);
 			}
 		}
 		catch (UrlParseErrorException const& parsingUrlError)

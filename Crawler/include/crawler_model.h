@@ -15,7 +15,7 @@ class CrawlerModel
 	: public Messager
 {
 private:
-	using Queue = std::deque<Url>;
+	using Queue = std::deque<std::string>;
 
 public:
 	enum QueueType

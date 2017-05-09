@@ -24,7 +24,7 @@ public:
 	CrawlerModel* model() const;
 	CrawlerSettings* settings() const;
 
-	void startCrawling();
+	void startCrawling(const std::atomic_bool& stopCrawling);
 
 private:
 	void handleRedirection(const HttpLib::HttpResponse* response);

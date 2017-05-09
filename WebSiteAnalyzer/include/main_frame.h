@@ -3,6 +3,7 @@
 #include "stdlibs.h"
 #include "ui_main_frame.h"
 #include "start_settings_dialog.h"
+#include "urls_crawler_model.h"
 #include "crawler_settings.h"
 #include "crawler_model.h"
 #include "crawler_controller.h"
@@ -12,27 +13,25 @@ namespace WebSiteAnalyzer
 
 class MainFrame 
 	: public QMainWindow
-	, public CrawlerImpl::IMessageReceiver
 {
 	Q_OBJECT
 
 public:
-	MainFrame(QWidget *parent = 0);
+	MainFrame(CrawlerImpl::CrawlerModel* model, QWidget *parent = 0);
 
-protected:
-	virtual void receiveMessage(const CrawlerImpl::IMessage& message) override;
+	void setModel(CrawlerImpl::CrawlerModel* model);
 
-private:
+	Q_SIGNAL void signal_startCrawling(CrawlerImpl::CrawlerSettings* settings);
 	Q_SLOT void slot_showStartSettingsDialog();
+	Q_SLOT void slot_modelUpdated();
 
 private:
 	Ui::MainFrameClass ui;
 
 	std::unique_ptr<StartSettingsDialog> m_startSettingsDialog;
+	std::unique_ptr<UrlsCrawlerModel> m_crawlerModel;
 
 	CrawlerImpl::CrawlerSettings m_crawlerSettings;
-	CrawlerImpl::CrawlerModel m_crawlerModel;
-	CrawlerImpl::CrawlerController m_crawlerController;
 };
 
 }

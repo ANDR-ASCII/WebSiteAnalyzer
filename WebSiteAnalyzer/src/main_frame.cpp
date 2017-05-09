@@ -4,16 +4,17 @@
 namespace WebSiteAnalyzer
 {
 
-MainFrame::MainFrame(QWidget *parent)
+MainFrame::MainFrame(CrawlerImpl::CrawlerModel* model, QWidget *parent)
 	: QMainWindow(parent)
 	, m_startSettingsDialog(new StartSettingsDialog(this))
 {
 	ui.setupUi(this);
 
-	connect(ui.startCrawlerButton, SIGNAL(clicked()), SLOT(slot_showStartSettingsDialog()));
+	m_crawlerModel.reset(new UrlsCrawlerModel(ui.crawlerListView));
+	m_crawlerModel->setInternalModel(model);
+	ui.crawlerListView->setModel(m_crawlerModel.get());
 
-	m_crawlerController.setModel(&m_crawlerModel);
-	m_crawlerController.setSettings(&m_crawlerSettings);
+	connect(ui.startCrawlerButton, SIGNAL(clicked()), SLOT(slot_showStartSettingsDialog()));
 }
 
 void MainFrame::slot_showStartSettingsDialog()
@@ -24,24 +25,13 @@ void MainFrame::slot_showStartSettingsDialog()
 		m_crawlerSettings.setMaxCrawlUrls(m_startSettingsDialog->maxCrawlUrls());
 		m_crawlerSettings.setRequestPause(std::chrono::milliseconds(m_startSettingsDialog->requestPause()));
 
-		m_crawlerController.startCrawling();
+		emit signal_startCrawling(&m_crawlerSettings);
 	}
 }
 
-void MainFrame::receiveMessage(const CrawlerImpl::IMessage& message)
+void MainFrame::slot_modelUpdated()
 {
-	switch (message.type())
-	{
-		case CrawlerImpl::IMessage::MessageType::WarningType:
-		{
-			const CrawlerImpl::WarningMessage& actualMessage =
-				static_cast<const CrawlerImpl::WarningMessage&>(message);
-
-			ui.logInfo->append(QString(actualMessage.warning().c_str()));
-
-			break;
-		}
-	}
+	m_crawlerModel->needToUpdate();
 }
 
 }

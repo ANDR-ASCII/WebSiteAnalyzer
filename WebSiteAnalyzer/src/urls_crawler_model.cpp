@@ -32,9 +32,9 @@ void UrlsCrawlerModel::setInternalModel(CrawlerImpl::CrawlerModel* internalModel
 
 void UrlsCrawlerModel::needToUpdate()
 {
-	QModelIndex topLeft = createIndex(m_oldSize, 1);
-	QModelIndex bottomRight = createIndex(m_internalModel->size(CrawlerImpl::CrawlerModel::InternalCrawledUrlQueue), 1, 
-		&m_internalModel->queue(CrawlerImpl::CrawlerModel::InternalCrawledUrlQueue)->back());
+	QModelIndex topLeft = createIndex(m_oldSize, 0, this);
+
+	QModelIndex bottomRight = createIndex(m_internalModel->size(CrawlerImpl::CrawlerModel::InternalCrawledUrlQueue), 0, this);
 
 	m_oldSize = m_internalModel->size(CrawlerImpl::CrawlerModel::InternalCrawledUrlQueue);
 

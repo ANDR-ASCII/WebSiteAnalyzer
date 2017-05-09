@@ -16,6 +16,16 @@ void MessageMapper::receiveMessage(const CrawlerImpl::IMessage& message)
 
 			break;
 		}
+
+		case CrawlerImpl::IMessage::MessageType::WarningType:
+		{
+			const CrawlerImpl::WarningMessage& actualMessage =
+				static_cast<const CrawlerImpl::WarningMessage&>(message);
+
+			emit signal_warningMessage(actualMessage.warning());
+
+			break;
+		}
 	}
 }
 

@@ -27,10 +27,8 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			if (currentUrl.isAbsoluteAddress() && !currentUrl.compareHost(hostUrl))
 			{
-				if (!isItemExistsIn(currentUrl, ExternalCrawledUrlQueue) &&
-					!isItemExistsIn(currentUrl, ExternalUrlQueue))
+				if (!isItemExistsIn(currentUrl, ExternalCrawledUrlQueue))
 				{
-					//m_externalUrlQueue.push_back(currentUrl.host());
 					storeUrl(currentUrl, ExternalUrlQueue);
 				}
 
@@ -39,10 +37,8 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			if (currentUrl.isAbsoluteAddress() && currentUrl.compareHost(hostUrl))
 			{
-				if (!isItemExistsIn(currentUrl, InternalCrawledUrlQueue) &&
-					!isItemExistsIn(currentUrl, InternalUrlQueue))
+				if (!isItemExistsIn(currentUrl, InternalCrawledUrlQueue))
 				{
-					//queue(InternalUrlQueue)->push_back(currentUrl.relativePath());
 					storeUrl(currentUrl, InternalUrlQueue);
 				}
 
@@ -56,10 +52,8 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			Url url = currentUrl.mergeRelativePaths(currentUrl, containingUrl);
 
-			if (!isItemExistsIn(url, InternalCrawledUrlQueue) &&
-				!isItemExistsIn(url, InternalUrlQueue))
+			if (!isItemExistsIn(url, InternalCrawledUrlQueue))
 			{
-				//queue(InternalUrlQueue)->push_back(url.relativePath());
 				storeUrl(url, InternalUrlQueue);
 			}
 		}
@@ -78,7 +72,10 @@ void CrawlerModel::storeUrl(const Url& url, int queueType)
 		queueType == InternalUrlQueue ||
 		queueType == InternalCrawledUrlQueue;
 
-	queue(queueType)->push_back(isInternalQueueType ? url.relativePath() : url.host());
+	if (!isItemExistsIn(url, queueType))
+	{
+		queue(queueType)->push_back(isInternalQueueType ? url.relativePath() : url.host());
+	}
 }
 
 bool CrawlerModel::isItemExistsIn(const Url& url, int queueType) const

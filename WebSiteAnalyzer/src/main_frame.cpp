@@ -12,6 +12,7 @@ MainFrame::MainFrame(CrawlerImpl::CrawlerModel* model, QWidget *parent)
 
 	m_crawlerModel.reset(new UrlsCrawlerModel(ui.crawlerListView));
 	m_crawlerModel->setInternalModel(model);
+
 	ui.crawlerListView->setModel(m_crawlerModel.get());
 
 	connect(ui.startCrawlerButton, SIGNAL(clicked()), SLOT(slot_showStartSettingsDialog()));
@@ -32,6 +33,11 @@ void MainFrame::slot_showStartSettingsDialog()
 void MainFrame::slot_modelUpdated()
 {
 	m_crawlerModel->needToUpdate();
+}
+
+void MainFrame::slot_warningMessage(const std::string& text)
+{
+	ui.logInfo->append(QString(text.c_str()));
 }
 
 }

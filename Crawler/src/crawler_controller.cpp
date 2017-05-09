@@ -49,13 +49,12 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 	{
 		if (model()->queue(CrawlerModel::InternalUrlQueue)->empty())
 		{
-			return;
+			break;
 		}
 
 		Url url = model()->queue(CrawlerModel::InternalUrlQueue)->front();
 
 		model()->storeUrl(url, CrawlerModel::InternalCrawledUrlQueue);
-		//model()->queue(CrawlerModel::InternalCrawledUrlQueue)->push_back(url);
 
 		model()->queue(CrawlerModel::InternalUrlQueue)->pop_front();
 
@@ -94,6 +93,8 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 
 		sendMessage(HttpResponseCodeMessage{ response->responseCode() });
 	}
+
+	sendMessage(WarningMessage{ "Crawling ended up!" });
 }
 
 void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response)
@@ -103,7 +104,7 @@ void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response)
 
 	Url url(urlFromLocationHeader);
 
-	if (settings()->startUrlAddress().protocol() == "https://")
+	if (url.protocol() == "https://")
 	{
 		sendMessage(WarningMessage{ "Current HTTP library does not support HTTPS protocol" });
 		return;

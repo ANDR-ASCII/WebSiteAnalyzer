@@ -11,3 +11,13 @@
 // C++
 #include <memory>
 #include <thread>
+
+#ifndef NDEBUG
+
+#define VERIFY(Connection) assert(Connection)
+
+#else
+
+#define VERIFY(Connection) Connection
+
+#endif

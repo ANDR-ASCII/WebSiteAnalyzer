@@ -23,12 +23,15 @@ void Application::crawlerThread()
 {
 	MessageMapper mapper;
 
-	connect(&mapper, SIGNAL(signal_modelUpdated()), 
-		m_mainFrame.get(), SLOT(slot_modelUpdated()), Qt::BlockingQueuedConnection
-	);
+	VERIFY(connect(&mapper, SIGNAL(signal_modelUpdated()), m_mainFrame.get(), SLOT(slot_modelUpdated()), Qt::BlockingQueuedConnection));
+
+	VERIFY(connect(&mapper, SIGNAL(signal_warningMessage(const std::string&)), m_mainFrame.get(), 
+		SLOT(slot_warningMessage(const std::string&)), Qt::BlockingQueuedConnection));
 
 	m_controller->addReceiver(&mapper);
 	m_controller->startCrawling(m_stopCrawler);
+
+	m_controller->deleteReceiver(&mapper);
 }
 
 int Application::exec()

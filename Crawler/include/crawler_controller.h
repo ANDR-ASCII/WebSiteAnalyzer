@@ -6,6 +6,7 @@
 namespace HttpLib
 {
 	class HttpResponse;
+	class HttpRequest;
 }
 
 namespace CrawlerImpl
@@ -27,7 +28,7 @@ public:
 	void startCrawling(const std::atomic_bool& stopCrawling);
 
 private:
-	void handleRedirection(const HttpLib::HttpResponse* response);
+	void handleRedirection(const HttpLib::HttpResponse* response, HttpLib::HttpRequest& request);
 
 private:
 	CrawlerModel* m_model;

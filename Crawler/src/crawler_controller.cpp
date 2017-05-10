@@ -78,7 +78,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 		if (response->is_301_MovedPermanently() ||
 			response->is_302_MovedTemporarily())
 		{
-			handleRedirection(response);
+			handleRedirection(response, request);
 		}
 		else
 		{
@@ -97,7 +97,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 	sendMessage(WarningMessage{ "Crawling ended up!" });
 }
 
-void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response)
+void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response, HttpLib::HttpRequest& request)
 {
 	std::string urlFromLocationHeader;
 	response->header("location", urlFromLocationHeader);
@@ -116,7 +116,9 @@ void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response)
 	}
 	else
 	{
-		model()->storeUrl(url, CrawlerModel::ExternalUrlQueue);
+		settings()->setHost(url);
+		request.setHost(url.host());
+		model()->storeUrl(url, CrawlerModel::InternalUrlQueue);
 	}
 }
 

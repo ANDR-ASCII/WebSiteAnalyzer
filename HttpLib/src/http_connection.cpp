@@ -138,7 +138,7 @@ const HttpLib::HttpResponse *HttpLib::HttpConnection::sendRequest(const HttpRequ
         }
 		if(!retval)
         {
-            throw HttpLib::HttpErrorException("Time-out.\n");
+            throw HttpLib::HttpErrorException("Timeout.\n");
         }
 
 		// Algorithm for read TCP fragments ====================================================

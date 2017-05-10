@@ -321,7 +321,7 @@ std::string TagParserPrivate::tagName(const std::string& tagString) const
 
 	if (tagString.empty())
 	{
-		throw std::invalid_argument("Empty tag string");
+		return std::string();
 	}
 
 	std::size_t position = 0;

@@ -5,38 +5,31 @@ namespace WebSiteAnalyzer
 
 UrlsCrawlerModel::UrlsCrawlerModel(QObject* parent)
 	: QAbstractListModel(parent)
-	, m_internalModel(nullptr)
-	, m_oldSize(0)
 {
 }
 
 int UrlsCrawlerModel::rowCount(const QModelIndex& parent) const
 {
-	return static_cast<int>(m_internalModel->size(CrawlerImpl::CrawlerModel::InternalCrawledUrlQueue));
+	return static_cast<int>(m_urls.size());
 }
 
 QVariant UrlsCrawlerModel::data(const QModelIndex& index, int role) const
 {
 	if (role == Qt::DisplayRole || !rowCount())
 	{
-		return QVariant(QString((*m_internalModel->queue(CrawlerImpl::CrawlerModel::InternalCrawledUrlQueue))[index.row()].c_str()));
+		return QVariant(m_urls[index.row()]);
 	}
 
 	return QVariant();
 }
 
-void UrlsCrawlerModel::setInternalModel(CrawlerImpl::CrawlerModel* internalModel)
+void UrlsCrawlerModel::slot_addUrl(const std::string& url)
 {
-	m_internalModel = internalModel;
-}
+	QModelIndex topLeft = createIndex(m_urls.size(), 0, this);
 
-void UrlsCrawlerModel::needToUpdate()
-{
-	QModelIndex topLeft = createIndex(m_oldSize, 0, this);
+	m_urls.push_back(QString(url.c_str()));
 
-	QModelIndex bottomRight = createIndex(m_internalModel->size(CrawlerImpl::CrawlerModel::InternalCrawledUrlQueue), 0, this);
-
-	m_oldSize = m_internalModel->size(CrawlerImpl::CrawlerModel::InternalCrawledUrlQueue);
+	QModelIndex bottomRight = createIndex(m_urls.size(), 0, this);
 
 	emit dataChanged(topLeft, bottomRight);
 }

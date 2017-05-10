@@ -27,7 +27,7 @@ void UrlsCrawlerModel::slot_addUrl(const std::string& url)
 {
 	QModelIndex topLeft = createIndex(m_urls.size(), 0, this);
 
-	m_urls.push_back(QString(url.c_str()));
+	m_urls.push_front(QString(url.c_str()));
 
 	QModelIndex bottomRight = createIndex(m_urls.size(), 0, this);
 

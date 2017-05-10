@@ -167,6 +167,11 @@ void TagParser::parseTags(const std::string& htmlPage, const std::string& tagNam
 		Tag tmpTag;
 		tagText = d_pointer->readTag(htmlPage, position);
 
+		if (Common::strToLower(d_pointer->tagName(tagText)).empty())
+		{
+			break;
+		}
+
 		// if find the specified tag, write it
 		if (Common::strToLower(d_pointer->tagName(tagText)) == nameTagCmp)
 		{
@@ -175,7 +180,16 @@ void TagParser::parseTags(const std::string& htmlPage, const std::string& tagNam
 			// if need parse attributes
 			if (parseAttributes)
 			{
-				tmpTag.setAttributes(d_pointer->readAllTagAttributes(tagText));
+				try
+				{
+					tmpTag.setAttributes(d_pointer->readAllTagAttributes(tagText));
+				}
+				catch (const std::logic_error& logicError)
+				{
+					//
+					// TODO
+					//
+				}
 			}
 
 			d_pointer->internalTagStorage().push_back(tmpTag);

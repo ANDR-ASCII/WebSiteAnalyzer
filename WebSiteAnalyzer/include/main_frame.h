@@ -25,6 +25,7 @@ public:
 	Q_SIGNAL void signal_startCrawlerCommand(CrawlerImpl::CrawlerSettings*);
 
 	Q_SLOT void slot_showStartSettingsDialog();
+	Q_SLOT void slot_queueSize(std::size_t size, int queueType);
 
 private:
 	Ui::MainFrameClass ui;

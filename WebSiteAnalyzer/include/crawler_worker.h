@@ -19,10 +19,13 @@ class CrawlerWorker
 public:
 	CrawlerWorker();
 
-	virtual void receiveMessage(const IMessage& message);
-
 	Q_SLOT void slot_startCrawler(CrawlerSettings* settings);
+
 	Q_SIGNAL void signal_addUrl(const std::string& url);
+	Q_SIGNAL void signal_queueSize(std::size_t size, int queueType);
+	
+protected:
+	virtual void receiveMessage(const IMessage& message);
 
 private:
 	std::unique_ptr<CrawlerModel> m_model;

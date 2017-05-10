@@ -190,7 +190,7 @@ std::string TagParserPrivate::readTag(const std::string& htmlPage, std::size_t& 
 
 	if (closeTagCharacterPosition == std::string::npos)
 	{
-		throw std::logic_error("Cannot find close tag character position");
+		return std::string();
 	}
 
 	// move pointer to the next character after close tag character position

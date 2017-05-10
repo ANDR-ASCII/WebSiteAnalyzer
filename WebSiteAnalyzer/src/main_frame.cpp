@@ -26,8 +26,11 @@ MainFrame::MainFrame(QWidget *parent)
 	VERIFY(connect(&m_crawlerThread, &QThread::finished, 
 		worker, &QObject::deleteLater));
 	
-	VERIFY(connect(worker, &CrawlerWorker::signal_addUrl, 
+	VERIFY(connect(worker, &CrawlerWorker::signal_addUrl,
 		m_crawlerModel.get(), &UrlsCrawlerModel::slot_addUrl, Qt::BlockingQueuedConnection));
+
+	VERIFY(connect(worker, &CrawlerWorker::signal_queueSize,
+		this, &MainFrame::slot_queueSize, Qt::BlockingQueuedConnection));
 
 	VERIFY(connect(this, &MainFrame::signal_startCrawlerCommand, 
 		worker, &CrawlerWorker::slot_startCrawler));
@@ -45,6 +48,31 @@ void MainFrame::slot_showStartSettingsDialog()
 
 		emit signal_startCrawlerCommand(m_settings.get());
 	}
+}
+
+void MainFrame::slot_queueSize(std::size_t size, int queueType)
+{
+	if (queueType == CrawlerModel::InternalUrlQueue)
+	{
+		ui.remainderLabel->setText(QString().setNum(static_cast<int>(size)));
+	}
+
+	if (queueType == CrawlerModel::InternalCrawledUrlQueue)
+	{
+		ui.crawledCountLabel->setText(QString().setNum(static_cast<int>(size)));
+	}
+
+	if (queueType == CrawlerModel::ExternalUrlQueue)
+	{
+		ui.externalUrlsCountLabel->setText(QString().setNum(static_cast<int>(size)));
+	}
+
+	int first = ui.remainderLabel->text().toInt() + 1;
+	int second = ui.crawledCountLabel->text().toInt() + 1;
+
+	int result = first / second;
+
+	ui.progressBar->setValue(result);
 }
 
 }

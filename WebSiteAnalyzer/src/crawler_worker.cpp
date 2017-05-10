@@ -23,6 +23,16 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 
 			break;
 		}
+
+		case IMessage::MessageType::CurrentQueueSize:
+		{
+			const QueueSizeMessage& actualMessage =
+				static_cast<const QueueSizeMessage&>(message);
+
+			emit signal_queueSize(actualMessage.size(), actualMessage.queueType());
+
+			break;
+		}
 	}
 }
 

@@ -45,6 +45,13 @@ void CrawlerWorker::slot_startCrawler(CrawlerSettings* settings)
 	m_controller->startCrawling(m_needToStopCrawling);
 
 	m_controller->deleteReceiver(this);
+
+	m_needToStopCrawling.store(false);
+}
+
+void CrawlerWorker::slot_stopCrawler()
+{
+	m_needToStopCrawling.store(true);
 }
 
 }

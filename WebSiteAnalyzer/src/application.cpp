@@ -51,8 +51,7 @@ int Application::exec()
 
 void Application::slot_stopCrawlerCommand()
 {
-	std::unique_lock<std::mutex> locker(m_mutex);
-	m_crawlerStopped.wait(locker, [this] { return m_crawlerActuallyStopped.load(); });
+	m_needToStopCrawler.store(true);
 }
 
 void Application::slot_startCrawlingCommand(CrawlerImpl::CrawlerSettings* settings)

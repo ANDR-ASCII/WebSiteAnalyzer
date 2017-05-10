@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="MainFrame">
+    <qresource prefix="/">
+        <file>images/spider_icon.png</file>
     </qresource>
 </RCC>

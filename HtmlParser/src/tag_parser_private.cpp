@@ -190,7 +190,7 @@ std::string TagParserPrivate::readTag(const std::string& htmlPage, std::size_t& 
 
 	if (closeTagCharacterPosition == std::string::npos)
 	{
-		throw std::logic_error("Cannot find close tag character position");
+		return std::string();
 	}
 
 	// move pointer to the next character after close tag character position
@@ -321,7 +321,7 @@ std::string TagParserPrivate::tagName(const std::string& tagString) const
 
 	if (tagString.empty())
 	{
-		throw std::invalid_argument("Empty tag string");
+		return std::string();
 	}
 
 	std::size_t position = 0;

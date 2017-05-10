@@ -12,6 +12,8 @@ set(AppHeadersDir include)
 
 # deps
 set(CommonLibHeadersDir ../Common/include)
+set(CrawlerLibHeadersDir ../Crawler/include)
+set(HtmlParserLibHeadersDir ../HtmlParser/include)
 
 find_package(Qt5 REQUIRED Widgets)
 
@@ -22,6 +24,9 @@ file(GLOB_RECURSE AppResourcesList "rcc/*.qrc")
 
 qt5_wrap_ui(AppFormsHeadersList ${AppFormsList})
 qt5_wrap_cpp(AppHeadersMocList ${AppFormsHeadersList})
+
+set(Boost_USE_STATIC_LIBS ON)
+find_package(Boost 1.64.0 COMPONENTS regex)
 
 add_executable(
 	${AppName} 
@@ -53,6 +58,8 @@ include_directories(
 	${AppHeadersDir}
 	${CommonLibHeadersDir}
 	${CrawlerLibHeadersDir}
+	${HtmlParserLibHeadersDir}
+	${Boost_INCLUDE_DIRS}
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -60,5 +67,6 @@ target_link_libraries(
 	${AppName}
 	${CrawlerLibName}
 	${CommonLibName}
+	${Boost_LIBRARIES}
 	Qt5::Widgets
 )

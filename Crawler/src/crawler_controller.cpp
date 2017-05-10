@@ -32,7 +32,7 @@ CrawlerImpl::CrawlerSettings* CrawlerController::settings() const
 	return m_settings;
 }
 
-void CrawlerController::startCrawling()
+void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 {
 	TagParser tagParser;
 	HttpConnection httpConnection;
@@ -45,30 +45,32 @@ void CrawlerController::startCrawling()
 	request.setHttpVersion(HttpRequest::Version::Version1_1);
 	request.setConnectionType(HttpRequest::ConnectionType::Close);
 
-	while (true)
+	while (stopCrawling == false)
 	{
-		CrawlerModel::SmartModelElementPtr url = 
-			model()->anyUrl(CrawlerModel::InternalUrlQueue);
+		if (model()->queue(CrawlerModel::InternalUrlQueue)->empty())
+		{
+			break;
+		}
 
-		url = model()->moveUrl(*url->value(), CrawlerModel::InternalUrlQueue, CrawlerModel::InternalCrawledUrlQueue);
+		Url url = model()->queue(CrawlerModel::InternalUrlQueue)->front();
+
+		model()->storeUrl(url, CrawlerModel::InternalCrawledUrlQueue);
+
+		model()->queue(CrawlerModel::InternalUrlQueue)->pop_front();
 
 		std::this_thread::sleep_for(settings()->requestPause());
 
-		sendMessage(CurrentRequestedUrlMessage{ settings()->startUrlAddress().host() + url->value()->relativePath() });
+		sendMessage(CurrentRequestedUrlMessage{ settings()->startUrlAddress().host() + url.relativePath() });
 		sendMessage(QueueSizeMessage{ CrawlerModel::InternalUrlQueue, model()->size(CrawlerModel::InternalUrlQueue) });
 		sendMessage(QueueSizeMessage{ CrawlerModel::InternalCrawledUrlQueue, model()->size(CrawlerModel::InternalCrawledUrlQueue) });
 		sendMessage(QueueSizeMessage{ CrawlerModel::ExternalUrlQueue, model()->size(CrawlerModel::ExternalUrlQueue) });
 
-		request.setRelativePath(url->value()->relativePath());
+		request.setRelativePath(url.relativePath());
 		request.build();
 		response = httpConnection.openUrl(request);
 
 		if (!response->isValid())
 		{
-			//
-			// TODO: handle this error at the start crawling
-			//
-
 			sendMessage(WarningMessage{ "Invalid response of server" });
 			continue;
 		}
@@ -76,26 +78,33 @@ void CrawlerController::startCrawling()
 		if (response->is_301_MovedPermanently() ||
 			response->is_302_MovedTemporarily())
 		{
-			handleRedirection(response);
+			handleRedirection(response, request);
 		}
 		else
 		{
 			tagParser.parseTags(response->entityBody(), "a");
-			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), *url->value());
+
+			//
+			// TODO: remove from tagParser all HTTPS urls
+			//
+
+			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), url);
 		}
 
 		sendMessage(HttpResponseCodeMessage{ response->responseCode() });
 	}
+
+	sendMessage(WarningMessage{ "Crawling ended up!" });
 }
 
-void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response)
+void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response, HttpLib::HttpRequest& request)
 {
 	std::string urlFromLocationHeader;
 	response->header("location", urlFromLocationHeader);
 
 	Url url(urlFromLocationHeader);
 
-	if (settings()->startUrlAddress().protocol() == "https://")
+	if (url.protocol() == "https://")
 	{
 		sendMessage(WarningMessage{ "Current HTTP library does not support HTTPS protocol" });
 		return;
@@ -107,7 +116,9 @@ void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response)
 	}
 	else
 	{
-		model()->storeUrl(url, CrawlerModel::ExternalUrlQueue);
+		settings()->setHost(url);
+		request.setHost(url.host());
+		model()->storeUrl(url, CrawlerModel::InternalUrlQueue);
 	}
 }
 

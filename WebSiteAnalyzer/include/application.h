@@ -6,15 +6,14 @@
 namespace WebSiteAnalyzer
 {
 
-class Application
+class Application : public QApplication
 {
+	Q_OBJECT
+
 public:
 	Application(int argc, char** argv);
 
-	int exec();
-
 private:
-	QApplication m_app;
 	std::unique_ptr<MainFrame> m_mainFrame;
 };
 

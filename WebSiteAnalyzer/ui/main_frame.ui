@@ -7,57 +7,79 @@
     <x>0</x>
     <y>0</y>
     <width>1038</width>
-    <height>556</height>
+    <height>593</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainFrame</string>
+   <string>SEO Helper</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../rcc/main_frame.qrc">
+    <normaloff>:/images/spider_icon.png</normaloff>:/images/spider_icon.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow 
+{
+	background-color: #ebecef;
+}
+
+QTabWidget QWidget #QListView
+{
+	background-color: #f4f5f6;
+}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="startCrawlerButton">
+      <property name="text">
+       <string>Старт</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="stopCrawlerButton">
+      <property name="text">
+       <string>Стоп</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QProgressBar" name="progressBar">
+      <property name="value">
+       <number>24</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="3">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="3">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
       </property>
       <widget class="QTabWidget" name="infoWidget">
        <property name="currentIndex">
         <number>0</number>
        </property>
        <widget class="QWidget" name="crawlerTab">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
         <attribute name="title">
          <string>Краулер</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QToolButton" name="startCrawlerButton">
-           <property name="text">
-            <string>...</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QToolButton" name="stopCrawlerButton">
-           <property name="text">
-            <string>...</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>931</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="1" column="0" colspan="3">
-          <widget class="QTableView" name="crawlerTableView"/>
+         <item row="0" column="0" colspan="2">
+          <widget class="QListView" name="crawlerListView"/>
          </item>
         </layout>
        </widget>
@@ -67,7 +89,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QTableView" name="externalUrlsTableView"/>
+          <widget class="QListView" name="externalUrlsListView"/>
          </item>
         </layout>
        </widget>
@@ -77,17 +99,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <widget class="QTableView" name="pages404TableView"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="recurseRedirectsTab">
-        <attribute name="title">
-         <string>Рекурсивные редиректы</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <item>
-          <widget class="QTableView" name="recurseRedirectsTableView"/>
+          <widget class="QListView" name="pages404ListView"/>
          </item>
         </layout>
        </widget>
@@ -117,7 +129,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_7">
          <item>
-          <widget class="QTableView" name="missingTitleTableView"/>
+          <widget class="QListView" name="missingTitleListView"/>
          </item>
         </layout>
        </widget>
@@ -127,25 +139,108 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <item>
-          <widget class="QTableView" name="missingDescriptionTableView"/>
+          <widget class="QListView" name="missingDescriptionListView"/>
          </item>
         </layout>
        </widget>
       </widget>
-      <widget class="QTextEdit" name="logInfo">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>180</height>
-        </size>
-       </property>
-      </widget>
+     </widget>
+    </item>
+    <item row="3" column="0" colspan="3">
+     <widget class="Line" name="line_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0" colspan="3">
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Состояние краулера</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Проверено:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="crawledCountLabel">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Найдено внешних ссылок:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>845</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>845</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="remainderLabel">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Осталось: </string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLabel" name="externalUrlsCountLabel">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>845</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>

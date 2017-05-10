@@ -32,7 +32,13 @@ MainFrame::MainFrame(QWidget *parent)
 	VERIFY(connect(worker, &CrawlerWorker::signal_queueSize,
 		this, &MainFrame::slot_queueSize, Qt::BlockingQueuedConnection));
 
-	VERIFY(connect(this, &MainFrame::signal_startCrawlerCommand, 
+	//
+	// slot_stopCrawler must execute only atomic operations!
+	//
+	VERIFY(connect(this, &MainFrame::signal_stopCrawlerCommand,
+		worker, &CrawlerWorker::slot_stopCrawler, Qt::DirectConnection));
+
+	VERIFY(connect(this, &MainFrame::signal_startCrawlerCommand,
 		worker, &CrawlerWorker::slot_startCrawler));
 
 	m_crawlerThread.start();

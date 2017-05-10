@@ -11,13 +11,15 @@
 namespace WebSiteAnalyzer
 {
 
+using namespace CrawlerImpl;
+
 class MainFrame 
 	: public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	MainFrame(CrawlerImpl::CrawlerModel* model, QWidget *parent = 0);
+	MainFrame(QWidget *parent = 0);
 
 	Q_SIGNAL void signal_startCrawling(CrawlerImpl::CrawlerSettings* settings);
 	Q_SIGNAL void signal_stopCrawlerCommand();
@@ -28,9 +30,16 @@ public:
 private:
 	Ui::MainFrameClass ui;
 	std::unique_ptr<StartSettingsDialog> m_startSettingsDialog;
-	CrawlerImpl::CrawlerSettings m_crawlerSettings;
-
 	std::unique_ptr<UrlsCrawlerModel> m_crawlerModel;
+
+	std::unique_ptr<CrawlerSettings> m_settings;
+	std::unique_ptr<CrawlerModel> m_model;
+	std::unique_ptr<CrawlerController> m_controller;
+
+	QThread m_crawlerThread;
+
+	std::atomic_bool m_needToStopCrawler;
+	std::atomic_bool m_crawlerActuallyStopped;
 };
 
 }

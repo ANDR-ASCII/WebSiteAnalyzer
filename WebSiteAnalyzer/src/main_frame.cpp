@@ -4,14 +4,20 @@
 namespace WebSiteAnalyzer
 {
 
-MainFrame::MainFrame(CrawlerImpl::CrawlerModel* model, QWidget *parent)
+MainFrame::MainFrame(QWidget *parent)
 	: QMainWindow(parent)
 	, m_startSettingsDialog(new StartSettingsDialog(this))
+	, m_crawlerModel(new UrlsCrawlerModel)
+	, m_settings(new CrawlerSettings)
+	, m_model(new CrawlerModel)
+	, m_controller(new CrawlerController)
+	, m_needToStopCrawler(false)
+	, m_crawlerActuallyStopped(true)
 {
 	ui.setupUi(this);
 
-	m_crawlerModel.reset(new UrlsCrawlerModel(ui.crawlerListView));
-	m_crawlerModel->setInternalModel(model);
+	m_crawlerModel->setParent(ui.crawlerListView);
+	m_crawlerModel->setInternalModel(m_model.get());
 
 	ui.crawlerListView->setModel(m_crawlerModel.get());
 
@@ -23,11 +29,11 @@ void MainFrame::slot_showStartSettingsDialog()
 {
 	if (m_startSettingsDialog->exec() == QDialog::Accepted)
 	{
-		m_crawlerSettings.setHost(m_startSettingsDialog->startAddress().toStdString());
-		m_crawlerSettings.setMaxCrawlUrls(m_startSettingsDialog->maxCrawlUrls());
-		m_crawlerSettings.setRequestPause(std::chrono::milliseconds(m_startSettingsDialog->requestPause()));
+		m_settings->setHost(m_startSettingsDialog->startAddress().toStdString());
+		m_settings->setMaxCrawlUrls(m_startSettingsDialog->maxCrawlUrls());
+		m_settings->setRequestPause(std::chrono::milliseconds(m_startSettingsDialog->requestPause()));
 
-		emit signal_startCrawling(&m_crawlerSettings);
+		emit signal_startCrawling(m_settings.get());
 	}
 }
 

@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QTextCodec>
 #include <QAbstractListModel>
+#include <QThread>
 
 // C++
 #include <memory>

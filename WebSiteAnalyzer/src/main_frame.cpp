@@ -14,11 +14,17 @@ MainFrame::MainFrame(QWidget *parent)
 {
 	ui.setupUi(this);
 
+	setWindowIcon(QIcon(QStringLiteral("images/spider_icon.png")));
+
+	ui.progressBar->setValue(0);
+	ui.progressBar->hide();
+
 	m_crawlerModel->setParent(ui.crawlerListView);
 	ui.crawlerListView->setModel(m_crawlerModel.get());
 
-	VERIFY(connect(ui.startCrawlerButton, SIGNAL(clicked()), SLOT(slot_showStartSettingsDialog())));
-	VERIFY(connect(ui.stopCrawlerButton, SIGNAL(clicked()), SIGNAL(signal_stopCrawlerCommand())));
+	VERIFY(connect(ui.startCrawlerButton, &QPushButton::clicked, this, &MainFrame::slot_showStartSettingsDialog));
+	VERIFY(connect(ui.stopCrawlerButton, &QPushButton::clicked, this, &MainFrame::signal_stopCrawlerCommand));
+	VERIFY(connect(ui.stopCrawlerButton, &QPushButton::clicked, this, &MainFrame::slot_hideProgressBarWhenStoppingCrawler));
 
 	CrawlerWorker* worker = new CrawlerWorker;
 	worker->moveToThread(&m_crawlerThread);
@@ -44,6 +50,11 @@ MainFrame::MainFrame(QWidget *parent)
 	m_crawlerThread.start();
 }
 
+void MainFrame::slot_hideProgressBarWhenStoppingCrawler()
+{
+	ui.progressBar->hide();
+}
+
 void MainFrame::slot_showStartSettingsDialog()
 {
 	if (m_startSettingsDialog->exec() == QDialog::Accepted)
@@ -53,6 +64,8 @@ void MainFrame::slot_showStartSettingsDialog()
 		m_settings->setRequestPause(std::chrono::milliseconds(m_startSettingsDialog->requestPause()));
 
 		emit signal_startCrawlerCommand(m_settings.get());
+
+		ui.progressBar->show();
 	}
 }
 
@@ -73,12 +86,13 @@ void MainFrame::slot_queueSize(std::size_t size, int queueType)
 		ui.externalUrlsCountLabel->setText(QString().setNum(static_cast<int>(size)));
 	}
 
-	int first = ui.remainderLabel->text().toInt() + 1;
-	int second = ui.crawledCountLabel->text().toInt() + 1;
+	double remainder = ui.remainderLabel->text().toDouble() + 1;
+	double crawled = ui.crawledCountLabel->text().toDouble() + 1;
 
-	int result = first / second;
+	double percent = (remainder + crawled) / 100;
+	double divider = !percent ? percent + 1 : percent;
 
-	ui.progressBar->setValue(result);
+	ui.progressBar->setValue(crawled / divider);
 }
 
 }

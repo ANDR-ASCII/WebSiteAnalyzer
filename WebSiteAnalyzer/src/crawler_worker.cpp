@@ -14,10 +14,10 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 {
 	switch (message.type())
 	{
-		case IMessage::MessageType::CurrentRequestedUrl:
+		case IMessage::MessageType::Url:
 		{
-			const CurrentRequestedUrlMessage& actualMessage =
-				static_cast<const CurrentRequestedUrlMessage&>(message);
+			const UrlMessage& actualMessage =
+				static_cast<const UrlMessage&>(message);
 
 			emit signal_addUrl(actualMessage.url());
 

@@ -11,7 +11,7 @@ class IMessage
 public:
 	enum class MessageType
 	{
-		CurrentRequestedUrl,
+		Url,
 		CurrentQueueSize,
 		QueueItersAndRefsInvalidated,
 		HttpResponseCode,
@@ -116,14 +116,12 @@ private:
 	std::size_t m_size;
 };
 
-//
-// TODO: need to omit url parsing when creating this object
-//
-class CurrentRequestedUrlMessage : public IMessage
+class UrlMessage : public IMessage
 {
 public:
-	CurrentRequestedUrlMessage(const std::string& url)
+	UrlMessage(const std::string& url, int responseCode)
 		: m_url(url)
+		, m_responseCode(responseCode)
 	{
 	}
 
@@ -132,13 +130,19 @@ public:
 		return m_url;
 	}
 
+	int responseCode() const noexcept
+	{
+		return m_responseCode;
+	}
+
 	virtual MessageType type() const noexcept override
 	{
-		return MessageType::CurrentRequestedUrl;
+		return MessageType::Url;
 	}
 
 private:
 	std::string m_url;
+	int m_responseCode;
 };
 
 }

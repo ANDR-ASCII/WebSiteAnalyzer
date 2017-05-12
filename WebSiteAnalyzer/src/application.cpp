@@ -1,5 +1,4 @@
 #include "application.h"
-#include "message_mapper.h"
 
 namespace WebSiteAnalyzer
 {

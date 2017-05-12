@@ -25,11 +25,11 @@ QVariant UrlsCrawlerModel::data(const QModelIndex& index, int role) const
 
 void UrlsCrawlerModel::slot_addUrl(const std::string& url)
 {
-	QModelIndex topLeft = createIndex(m_urls.size(), 0, this);
+	QModelIndex topLeft = createIndex(static_cast<int>(m_urls.size()), 0, this);
 
 	m_urls.push_front(QString(url.c_str()));
 
-	QModelIndex bottomRight = createIndex(m_urls.size(), 0, this);
+	QModelIndex bottomRight = createIndex(static_cast<int>(m_urls.size()), 0, this);
 
 	emit dataChanged(topLeft, bottomRight);
 }

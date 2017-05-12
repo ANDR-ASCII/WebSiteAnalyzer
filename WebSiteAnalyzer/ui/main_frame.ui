@@ -13,10 +13,6 @@
   <property name="windowTitle">
    <string>SEO Helper</string>
   </property>
-  <property name="windowIcon">
-   <iconset resource="../rcc/main_frame.qrc">
-    <normaloff>:/images/spider_icon.png</normaloff>:/images/spider_icon.png</iconset>
-  </property>
   <property name="styleSheet">
    <string notr="true">QMainWindow 
 {

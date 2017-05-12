@@ -60,10 +60,6 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 
 		std::this_thread::sleep_for(settings()->requestPause());
 
-		sendMessage(QueueSizeMessage{ CrawlerModel::InternalUrlQueue, model()->size(CrawlerModel::InternalUrlQueue) });
-		sendMessage(QueueSizeMessage{ CrawlerModel::InternalCrawledUrlQueue, model()->size(CrawlerModel::InternalCrawledUrlQueue) });
-		sendMessage(QueueSizeMessage{ CrawlerModel::ExternalUrlQueue, model()->size(CrawlerModel::ExternalUrlQueue) });
-
 		request.setRelativePath(url.relativePath());
 		request.build();
 		response = httpConnection.openUrl(request);
@@ -91,6 +87,9 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 		}
 
 		sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), response->responseCode() });
+		sendMessage(QueueSizeMessage{ CrawlerModel::InternalUrlQueue, model()->size(CrawlerModel::InternalUrlQueue) });
+		sendMessage(QueueSizeMessage{ CrawlerModel::InternalCrawledUrlQueue, model()->size(CrawlerModel::InternalCrawledUrlQueue) });
+		sendMessage(QueueSizeMessage{ CrawlerModel::ExternalUrlQueue, model()->size(CrawlerModel::ExternalUrlQueue) });
 	}
 
 	sendMessage(WarningMessage{ "Crawling ended up!" });

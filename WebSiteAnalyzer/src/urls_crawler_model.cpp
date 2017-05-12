@@ -23,7 +23,7 @@ QVariant UrlsCrawlerModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
-void UrlsCrawlerModel::slot_addUrl(const std::string& url)
+void UrlsCrawlerModel::slot_addUrl(const std::string& url, int responseCode)
 {
 	QModelIndex topLeft = createIndex(static_cast<int>(m_urls.size()), 0, this);
 

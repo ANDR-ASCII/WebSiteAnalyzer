@@ -137,7 +137,17 @@ QTabWidget QWidget #QListView
         </attribute>
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0" colspan="2">
-          <widget class="QListView" name="crawlerListView"/>
+          <widget class="QTableView" name="crawlerTableView">
+           <property name="gridStyle">
+            <enum>Qt::SolidLine</enum>
+           </property>
+           <attribute name="horizontalHeaderDefaultSectionSize">
+            <number>300</number>
+           </attribute>
+           <attribute name="horizontalHeaderMinimumSectionSize">
+            <number>37</number>
+           </attribute>
+          </widget>
          </item>
         </layout>
        </widget>

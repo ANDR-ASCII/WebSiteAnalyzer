@@ -12,6 +12,7 @@ public:
 	enum class MessageType
 	{
 		Url,
+		DNSError,
 		CurrentQueueSize,
 		QueueItersAndRefsInvalidated,
 		HttpResponseCode,
@@ -143,6 +144,15 @@ public:
 private:
 	std::string m_url;
 	int m_responseCode;
+};
+
+class DNSErrorMessage : public IMessage
+{
+public:
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::DNSError;
+	}
 };
 
 }

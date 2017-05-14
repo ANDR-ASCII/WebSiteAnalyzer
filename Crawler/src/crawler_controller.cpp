@@ -62,7 +62,21 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 
 		request.setRelativePath(url.relativePath());
 		request.build();
-		response = httpConnection.openUrl(request);
+
+		try
+		{
+			response = httpConnection.openUrl(request);
+		}
+		catch (const HttpLib::HttpErrorException& httpError)
+		{
+			if (!model()->size(CrawlerModel::InternalUrlQueue))
+			{
+				sendMessage(DNSErrorMessage{});
+				break;
+			}
+		}
+
+		sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), response->responseCode() });
 
 		if (!response->isValid())
 		{
@@ -86,7 +100,6 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), url);
 		}
 
-		sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), response->responseCode() });
 		sendMessage(QueueSizeMessage{ CrawlerModel::InternalUrlQueue, model()->size(CrawlerModel::InternalUrlQueue) });
 		sendMessage(QueueSizeMessage{ CrawlerModel::InternalCrawledUrlQueue, model()->size(CrawlerModel::InternalCrawledUrlQueue) });
 		sendMessage(QueueSizeMessage{ CrawlerModel::ExternalUrlQueue, model()->size(CrawlerModel::ExternalUrlQueue) });

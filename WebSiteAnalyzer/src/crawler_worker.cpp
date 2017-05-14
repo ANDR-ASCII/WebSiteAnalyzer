@@ -33,6 +33,13 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 
 			break;
 		}
+
+		case IMessage::MessageType::DNSError:
+		{
+			emit signal_DNSError();
+
+			break;
+		}
 	}
 }
 

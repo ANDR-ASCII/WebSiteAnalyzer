@@ -27,11 +27,15 @@ public:
 	Q_SLOT void slot_hideProgressBarWhenStoppingCrawler();
 	Q_SLOT void slot_showStartSettingsDialog();
 	Q_SLOT void slot_queueSize(std::size_t size, int queueType);
+	Q_SLOT void slot_DNSError();
+
+private:
+	void initialize();
+	void initializeModelsAndViews();
 
 private:
 	Ui::MainFrameClass ui;
 	std::unique_ptr<StartSettingsDialog> m_startSettingsDialog;
-	std::unique_ptr<UrlsCrawlerModel> m_crawlerModel;
 	std::unique_ptr<CrawlerSettings> m_settings;
 
 	QThread m_crawlerThread;

@@ -95,7 +95,7 @@ void HttpLib::HttpConnection::setConnection(const std::string &server)
         // 1 if successful conversion of address
         else if ((servAddr_.sin_addr.s_addr = inet_addr(lastServerName.c_str())))
         {
-            throw HttpLib::HttpErrorException("Fail to get IPv4 address of server.\n");
+            throw HttpLib::HttpErrorException("Fail to get IPv4 address of server from DNS.\n");
         }
     }
 

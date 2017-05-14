@@ -24,6 +24,7 @@ public:
 
 	Q_SIGNAL void signal_addUrl(const std::string& url, int responseCode);
 	Q_SIGNAL void signal_queueSize(std::size_t size, int queueType);
+	Q_SIGNAL void signal_DNSError();
 	
 protected:
 	virtual void receiveMessage(const IMessage& message);

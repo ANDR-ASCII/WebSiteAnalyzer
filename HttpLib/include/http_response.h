@@ -25,10 +25,10 @@ namespace HttpLib
 
         enum ResponseCode
         {
-              Continue100
+              Continue100 = 100
             , SwitchingProtocol101
             //=================================
-            , Ok200
+            , Ok200 = 200
             , Created201
             , Accepted202
             , NonAuthoritativeInformation203
@@ -36,14 +36,14 @@ namespace HttpLib
             , ResetContent205
             , PartialContent206
             //=================================
-            , MultipleChoices300
+            , MultipleChoices300 = 300
             , MovedPermanently301
             , MovedTemporarily302
             , SeeOther303
             , NotModified304
             , UseProxy305
             //=================================
-            , BadRequest400
+            , BadRequest400 = 400
             , Unauthorized401
             , PaymentRequired402
             , Forbidden403
@@ -54,13 +54,13 @@ namespace HttpLib
             , RequestTimeout408
             , Conflict409
             , Gone410
-            , LengthRequired
+            , LengthRequired411
             , PreconditionFailed412
             , RequestEntityTooLarge413
             , RequestUriTooLong414
             , UnsupportedMediaType415
             //=================================
-            , InternalServerError500
+            , InternalServerError500 = 500
             , NotImplemented501
             , BadGateway502
             , ServiceUnavailable503

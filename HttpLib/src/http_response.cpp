@@ -340,7 +340,7 @@ bool HttpLib::HttpResponse::is_410_Gone() const
 
 bool HttpLib::HttpResponse::is_411_LengthRequired() const
 {
-    return m_serverResponseCode == ResponseCode::LengthRequired;
+    return m_serverResponseCode == ResponseCode::LengthRequired411;
 }
 
 bool HttpLib::HttpResponse::is_412_PreconditionFailed() const
@@ -585,7 +585,7 @@ void HttpLib::HttpResponse::determineResponseCode(const std::string &checkStr)
 	// 411 Length Required
 	if (temporary.find("411") != std::string::npos)
 	{
-		m_serverResponseCode = ResponseCode::LengthRequired;
+		m_serverResponseCode = ResponseCode::LengthRequired411;
 		return;
 	}
 

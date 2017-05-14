@@ -6,48 +6,14 @@
 namespace WebSiteAnalyzer
 {
 
-MainFrame::MainFrame(QWidget *parent)
+MainFrame::MainFrame(QWidget* parent)
 	: QMainWindow(parent)
 	, m_startSettingsDialog(new StartSettingsDialog(this))
-	, m_crawlerModel(new UrlsCrawlerModel)
 	, m_settings(new CrawlerSettings)
 {
-	ui.setupUi(this);
+	initialize();
 
-	setWindowIcon(QIcon(QStringLiteral("images/spider_icon.png")));
 
-	ui.progressBar->setValue(0);
-	ui.progressBar->hide();
-
-	m_crawlerModel->setParent(ui.crawlerListView);
-	ui.crawlerListView->setModel(m_crawlerModel.get());
-
-	VERIFY(connect(ui.startCrawlerButton, &QPushButton::clicked, this, &MainFrame::slot_showStartSettingsDialog));
-	VERIFY(connect(ui.stopCrawlerButton, &QPushButton::clicked, this, &MainFrame::signal_stopCrawlerCommand));
-	VERIFY(connect(ui.stopCrawlerButton, &QPushButton::clicked, this, &MainFrame::slot_hideProgressBarWhenStoppingCrawler));
-
-	CrawlerWorker* worker = new CrawlerWorker;
-	worker->moveToThread(&m_crawlerThread);
-
-	VERIFY(connect(&m_crawlerThread, &QThread::finished, 
-		worker, &QObject::deleteLater));
-	
-	VERIFY(connect(worker, &CrawlerWorker::signal_addUrl,
-		m_crawlerModel.get(), &UrlsCrawlerModel::slot_addUrl, Qt::BlockingQueuedConnection));
-
-	VERIFY(connect(worker, &CrawlerWorker::signal_queueSize,
-		this, &MainFrame::slot_queueSize, Qt::BlockingQueuedConnection));
-
-	//
-	// slot_stopCrawler must execute only atomic operations!
-	//
-	VERIFY(connect(this, &MainFrame::signal_stopCrawlerCommand,
-		worker, &CrawlerWorker::slot_stopCrawler, Qt::DirectConnection));
-
-	VERIFY(connect(this, &MainFrame::signal_startCrawlerCommand,
-		worker, &CrawlerWorker::slot_startCrawler));
-
-	m_crawlerThread.start();
 }
 
 void MainFrame::slot_hideProgressBarWhenStoppingCrawler()
@@ -93,6 +59,61 @@ void MainFrame::slot_queueSize(std::size_t size, int queueType)
 	double divider = !percent ? percent + 1 : percent;
 
 	ui.progressBar->setValue(crawled / divider);
+}
+
+void MainFrame::slot_DNSError()
+{
+	QMessageBox::critical(this, "DNS Error", "Cannot resolve address", QMessageBox::Ok);
+}
+
+void MainFrame::initialize()
+{
+	ui.setupUi(this);
+	setWindowIcon(QIcon(QStringLiteral("images/spider_icon.png")));
+
+	VERIFY(connect(ui.startCrawlerButton, &QPushButton::clicked, this, &MainFrame::slot_showStartSettingsDialog));
+	VERIFY(connect(ui.stopCrawlerButton, &QPushButton::clicked, this, &MainFrame::signal_stopCrawlerCommand));
+	VERIFY(connect(ui.stopCrawlerButton, &QPushButton::clicked, this, &MainFrame::slot_hideProgressBarWhenStoppingCrawler));
+
+	initializeModelsAndViews();
+
+	m_crawlerThread.start();
+}
+
+void MainFrame::initializeModelsAndViews()
+{
+	UrlsCrawlerModel* crawlerModel = new UrlsCrawlerModel(ui.crawlerTableView);
+
+	ui.progressBar->setValue(0);
+	ui.progressBar->hide();
+
+	ui.crawlerTableView->verticalHeader()->hide();
+	ui.crawlerTableView->horizontalHeader()->setDefaultSectionSize(ui.crawlerTableView->width() / crawlerModel->columnCount());
+	ui.crawlerTableView->setModel(crawlerModel);
+
+	CrawlerWorker* worker = new CrawlerWorker;
+	worker->moveToThread(&m_crawlerThread);
+
+	VERIFY(connect(&m_crawlerThread, &QThread::finished,
+		worker, &QObject::deleteLater));
+
+	VERIFY(connect(worker, &CrawlerWorker::signal_addUrl,
+		crawlerModel, &UrlsCrawlerModel::slot_addUrl, Qt::BlockingQueuedConnection));
+
+	VERIFY(connect(worker, &CrawlerWorker::signal_queueSize,
+		this, &MainFrame::slot_queueSize, Qt::BlockingQueuedConnection));
+
+	VERIFY(connect(worker, &CrawlerWorker::signal_DNSError, 
+		this, &MainFrame::slot_DNSError, Qt::QueuedConnection));
+
+	//
+	// slot_stopCrawler must execute only atomic operations!
+	//
+	VERIFY(connect(this, &MainFrame::signal_stopCrawlerCommand,
+		worker, &CrawlerWorker::slot_stopCrawler, Qt::DirectConnection));
+
+	VERIFY(connect(this, &MainFrame::signal_startCrawlerCommand,
+		worker, &CrawlerWorker::slot_startCrawler));
 }
 
 }

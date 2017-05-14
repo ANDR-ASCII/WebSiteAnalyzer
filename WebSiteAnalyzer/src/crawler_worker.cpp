@@ -19,7 +19,7 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 			const UrlMessage& actualMessage =
 				static_cast<const UrlMessage&>(message);
 
-			emit signal_addUrl(actualMessage.url());
+			emit signal_addUrl(actualMessage.url(), actualMessage.responseCode());
 
 			break;
 		}
@@ -30,6 +30,13 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 				static_cast<const QueueSizeMessage&>(message);
 
 			emit signal_queueSize(actualMessage.size(), actualMessage.queueType());
+
+			break;
+		}
+
+		case IMessage::MessageType::DNSError:
+		{
+			emit signal_DNSError();
 
 			break;
 		}

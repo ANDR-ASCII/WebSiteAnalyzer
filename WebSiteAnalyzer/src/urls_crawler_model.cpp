@@ -4,8 +4,11 @@ namespace WebSiteAnalyzer
 {
 
 UrlsCrawlerModel::UrlsCrawlerModel(QObject* parent)
-	: QAbstractListModel(parent)
+	: QAbstractTableModel(parent)
 {
+	m_headerData 
+		<< "URL" 
+		<< "HTTP Response Code";
 }
 
 int UrlsCrawlerModel::rowCount(const QModelIndex& parent) const
@@ -13,25 +16,44 @@ int UrlsCrawlerModel::rowCount(const QModelIndex& parent) const
 	return static_cast<int>(m_urls.size());
 }
 
-QVariant UrlsCrawlerModel::data(const QModelIndex& index, int role) const
+int UrlsCrawlerModel::columnCount(const QModelIndex& parent) const
 {
-	if (role == Qt::DisplayRole || !rowCount())
+	return m_headerData.size();
+}
+
+QVariant UrlsCrawlerModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+	if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
 	{
-		return QVariant(m_urls[index.row()]);
+		assert(section < m_headerData.size());
+
+		return m_headerData[section];
 	}
 
 	return QVariant();
 }
 
-void UrlsCrawlerModel::slot_addUrl(const std::string& url)
+QVariant UrlsCrawlerModel::data(const QModelIndex& index, int role) const
 {
-	QModelIndex topLeft = createIndex(static_cast<int>(m_urls.size()), 0, this);
+	if (role == Qt::DisplayRole || !rowCount())
+	{
+		assert(index.row() < static_cast<int>(m_urls.size()));
 
-	m_urls.push_front(QString(url.c_str()));
+		const std::pair<QString, int>& pair = m_urls[index.row()];
 
-	QModelIndex bottomRight = createIndex(static_cast<int>(m_urls.size()), 0, this);
+		return QVariant(index.column() == 0 ? pair.first : QString().setNum(pair.second));
+	}
 
-	emit dataChanged(topLeft, bottomRight);
+	return QVariant();
+}
+
+void UrlsCrawlerModel::slot_addUrl(const std::string& url, int responseCode)
+{
+	beginResetModel();
+
+	m_urls.push_front(std::make_pair(QString(url.c_str()), responseCode));
+
+	endResetModel();
 }
 
 }

@@ -67,7 +67,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 		{
 			response = httpConnection.openUrl(request);
 		}
-		catch (const HttpLib::HttpErrorException& httpError)
+		catch (const HttpLib::HttpErrorException&)
 		{
 			if (!model()->size(CrawlerModel::InternalUrlQueue))
 			{
@@ -100,6 +100,9 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), url);
 		}
 
+		sendMessage(QueueSizeMessage{ CrawlerModel::InternalUrlQueue | CrawlerModel::InternalCrawledUrlQueue, 
+			model()->size(CrawlerModel::InternalUrlQueue) + model()->size(CrawlerModel::InternalCrawledUrlQueue) });
+
 		sendMessage(QueueSizeMessage{ CrawlerModel::InternalUrlQueue, model()->size(CrawlerModel::InternalUrlQueue) });
 		sendMessage(QueueSizeMessage{ CrawlerModel::InternalCrawledUrlQueue, model()->size(CrawlerModel::InternalCrawledUrlQueue) });
 		sendMessage(QueueSizeMessage{ CrawlerModel::ExternalUrlQueue, model()->size(CrawlerModel::ExternalUrlQueue) });
@@ -121,7 +124,7 @@ void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response,
 		return;
 	}
 
-	if (url.compareHost(settings()->startUrlAddress()))
+	if (url.compareHost(settings()->startUrlAddress()) || url.host().empty())
 	{
 		model()->storeUrl(url, CrawlerModel::InternalUrlQueue);
 	}

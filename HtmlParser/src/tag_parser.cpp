@@ -184,7 +184,7 @@ void TagParser::parseTags(const std::string& htmlPage, const std::string& tagNam
 				{
 					tmpTag.setAttributes(d_pointer->readAllTagAttributes(tagText));
 				}
-				catch (const std::logic_error& logicError)
+				catch (const std::logic_error&)
 				{
 					//
 					// TODO

@@ -16,6 +16,7 @@ file(GLOB_RECURSE HttpLibHeadersList "include/*.h")
 if(MSVC)
 	add_definitions(
 		/D _WINSOCK_DEPRECATED_NO_WARNINGS
+		/MP
 	)
 endif()
 

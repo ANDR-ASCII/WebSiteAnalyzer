@@ -37,9 +37,9 @@ void MainFrame::slot_showStartSettingsDialog()
 
 void MainFrame::slot_queueSize(std::size_t size, int queueType)
 {
-	if (queueType == CrawlerModel::InternalUrlQueue)
+	if (queueType == (CrawlerModel::InternalUrlQueue | CrawlerModel::InternalCrawledUrlQueue))
 	{
-		ui.remainderLabel->setText(QString().setNum(static_cast<int>(size)));
+		ui.amountLabel->setText(QString().setNum(static_cast<int>(size)));
 	}
 
 	if (queueType == CrawlerModel::InternalCrawledUrlQueue)
@@ -52,7 +52,7 @@ void MainFrame::slot_queueSize(std::size_t size, int queueType)
 		ui.externalUrlsCountLabel->setText(QString().setNum(static_cast<int>(size)));
 	}
 
-	double remainder = ui.remainderLabel->text().toDouble() + 1;
+	double remainder = ui.amountLabel->text().toDouble() + 1;
 	double crawled = ui.crawledCountLabel->text().toDouble() + 1;
 
 	double percent = (remainder + crawled) / 100;

@@ -16,7 +16,7 @@ if(MSVC)
 	include_directories(include/)
 	
 	add_definitions(
-		-Dinline = __inline
+		-Dinline=__inline
 		/MP
 	)
 	

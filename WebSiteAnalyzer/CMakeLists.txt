@@ -45,6 +45,7 @@ add_definitions(
 if(MSVC)
 	add_definitions(
 		/EHsc
+		/MP
 	)
 	
 	set_target_properties(

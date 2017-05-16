@@ -20,10 +20,10 @@ private:
 public:
 	enum QueueType
 	{
-		InternalUrlQueue,
-		InternalCrawledUrlQueue,
-		ExternalUrlQueue,
-		ExternalCrawledUrlQueue
+		InternalUrlQueue = 1 << 0,
+		InternalCrawledUrlQueue = 1 << 1,
+		ExternalUrlQueue = 1 << 2,
+		ExternalCrawledUrlQueue = 1 << 3
 	};
 
 	//!

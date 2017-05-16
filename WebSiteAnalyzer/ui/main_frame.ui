@@ -80,7 +80,7 @@ QTabWidget QWidget #QListView
         </spacer>
        </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="remainderLabel">
+        <widget class="QLabel" name="amountLabel">
          <property name="text">
           <string>0</string>
          </property>
@@ -89,7 +89,7 @@ QTabWidget QWidget #QListView
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Осталось: </string>
+          <string>Всего: </string>
          </property>
         </widget>
        </item>

@@ -3,10 +3,7 @@
 #include "stdlibs.h"
 #include "ui_main_frame.h"
 #include "start_settings_dialog.h"
-#include "urls_crawler_model.h"
 #include "crawler_settings.h"
-#include "crawler_model.h"
-#include "crawler_controller.h"
 
 namespace WebSiteAnalyzer
 {

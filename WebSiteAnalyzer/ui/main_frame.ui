@@ -157,7 +157,7 @@ QTabWidget QWidget #QListView
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QListView" name="externalUrlsListView"/>
+          <widget class="QTableView" name="externalUrlsTableView"/>
          </item>
         </layout>
        </widget>

@@ -19,6 +19,18 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 			const UrlMessage& actualMessage =
 				static_cast<const UrlMessage&>(message);
 
+			if (actualMessage.queueType() == CrawlerModel::ExternalUrlQueue)
+			{
+				emit signal_addExternalUrl(actualMessage.url());
+
+				return;
+			}
+
+			if (actualMessage.responseCode() == 404)
+			{
+				emit signal_add404Url(actualMessage.url());
+			}
+			
 			emit signal_addUrl(actualMessage.url(), actualMessage.responseCode());
 
 			break;
@@ -48,10 +60,12 @@ void CrawlerWorker::slot_startCrawler(CrawlerSettings* settings)
 	m_controller->setModel(m_model.get());
 	m_controller->setSettings(settings);
 	m_controller->addReceiver(this);
+	m_model->addReceiver(this);
 
 	m_controller->startCrawling(m_needToStopCrawling);
 
 	m_controller->deleteReceiver(this);
+	m_model->deleteReceiver(this);
 
 	m_needToStopCrawling.store(false);
 }

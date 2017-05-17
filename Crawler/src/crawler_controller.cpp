@@ -76,7 +76,8 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			}
 		}
 
-		sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), response->responseCode() });
+		sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), 
+			response->responseCode(), CrawlerModel::InternalCrawledUrlQueue });
 
 		if (!response->isValid())
 		{

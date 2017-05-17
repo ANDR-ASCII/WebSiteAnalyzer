@@ -120,9 +120,10 @@ private:
 class UrlMessage : public IMessage
 {
 public:
-	UrlMessage(const std::string& url, int responseCode)
+	UrlMessage(const std::string& url, int responseCode, int queueType)
 		: m_url(url)
 		, m_responseCode(responseCode)
+		, m_queueType(queueType)
 	{
 	}
 
@@ -136,6 +137,11 @@ public:
 		return m_responseCode;
 	}
 
+	int queueType() const noexcept
+	{
+		return m_queueType;
+	}
+
 	virtual MessageType type() const noexcept override
 	{
 		return MessageType::Url;
@@ -144,6 +150,7 @@ public:
 private:
 	std::string m_url;
 	int m_responseCode;
+	int m_queueType;
 };
 
 class DNSErrorMessage : public IMessage

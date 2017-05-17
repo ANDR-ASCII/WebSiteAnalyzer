@@ -27,9 +27,11 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			if (currentUrl.isAbsoluteAddress() && !currentUrl.compareHost(hostUrl))
 			{
-				if (!isItemExistsIn(currentUrl, ExternalCrawledUrlQueue))
+				if (!isItemExistsIn(currentUrl, ExternalCrawledUrlQueue) && !isItemExistsIn(currentUrl, ExternalUrlQueue))
 				{
 					storeUrl(currentUrl, ExternalUrlQueue);
+
+					sendMessage(UrlMessage{ currentUrl.host(), 200, CrawlerModel::ExternalUrlQueue });
 				}
 
 				continue;

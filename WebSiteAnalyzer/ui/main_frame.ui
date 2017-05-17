@@ -167,7 +167,7 @@ QTabWidget QWidget #QListView
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <widget class="QListView" name="pages404ListView"/>
+          <widget class="QTableView" name="pages404TableView"/>
          </item>
         </layout>
        </widget>

@@ -57,8 +57,14 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 
 void CrawlerWorker::slot_startCrawler(CrawlerSettings* settings)
 {
+	//
+	// when closes program this thread will attempt to access
+	// to deleted object. Need to copy
+	//
+	CrawlerSettings selfSettings = *settings;
+
 	m_controller->setModel(m_model.get());
-	m_controller->setSettings(settings);
+	m_controller->setSettings(&selfSettings);
 	m_controller->addReceiver(this);
 	m_model->addReceiver(this);
 

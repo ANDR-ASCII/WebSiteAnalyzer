@@ -4,6 +4,7 @@
 #include "crawler_settings.h"
 #include "external_urls_model.h"
 #include "urls_crawler_model.h"
+#include "pages_404_model.h"
 
 namespace WebSiteAnalyzer
 {
@@ -86,6 +87,7 @@ void MainFrame::initializeModelsAndViews()
 {
 	UrlsCrawlerModel* crawlerModel = new UrlsCrawlerModel(ui.crawlerTableView);
 	ExternalUrlsModel* externalUrlsModel = new ExternalUrlsModel(ui.crawlerTableView);
+	Pages404Model* pages404Model = new Pages404Model(ui.pages404TableView);
 
 	ui.progressBar->setValue(0);
 	ui.progressBar->hide();
@@ -95,8 +97,12 @@ void MainFrame::initializeModelsAndViews()
 	ui.crawlerTableView->setModel(crawlerModel);
 
 	ui.externalUrlsTableView->verticalHeader()->hide();
-	ui.externalUrlsTableView->horizontalHeader()->setDefaultSectionSize(ui.externalUrlsTableView->width() / externalUrlsModel->columnCount());
+	ui.externalUrlsTableView->horizontalHeader()->setDefaultSectionSize(700);
 	ui.externalUrlsTableView->setModel(externalUrlsModel);
+
+	ui.pages404TableView->verticalHeader()->hide();
+	ui.pages404TableView->horizontalHeader()->setDefaultSectionSize(700);
+	ui.pages404TableView->setModel(pages404Model);
 
 	CrawlerWorker* worker = new CrawlerWorker;
 	worker->moveToThread(&m_crawlerThread);
@@ -109,6 +115,9 @@ void MainFrame::initializeModelsAndViews()
 
 	VERIFY(connect(worker, &CrawlerWorker::signal_addExternalUrl,
 		externalUrlsModel, &ExternalUrlsModel::slot_addUrl, Qt::BlockingQueuedConnection));
+
+	VERIFY(connect(worker, &CrawlerWorker::signal_add404Url,
+		pages404Model, &Pages404Model::slot_addUrl, Qt::BlockingQueuedConnection));
 
 	VERIFY(connect(worker, &CrawlerWorker::signal_queueSize,
 		this, &MainFrame::slot_queueSize, Qt::BlockingQueuedConnection));

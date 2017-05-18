@@ -5,6 +5,7 @@
 #include "external_urls_model.h"
 #include "urls_crawler_model.h"
 #include "pages_404_model.h"
+#include "duplicated_titles_model.h"
 
 namespace WebSiteAnalyzer
 {
@@ -88,6 +89,8 @@ void MainFrame::initializeModelsAndViews()
 	UrlsCrawlerModel* crawlerModel = new UrlsCrawlerModel(ui.crawlerTableView);
 	ExternalUrlsModel* externalUrlsModel = new ExternalUrlsModel(ui.crawlerTableView);
 	Pages404Model* pages404Model = new Pages404Model(ui.pages404TableView);
+	DuplicatedTitlesModel* duplicatedTitlesModel = new DuplicatedTitlesModel(ui.titleDuplicatesTableView);
+
 
 	ui.progressBar->setValue(0);
 	ui.progressBar->hide();
@@ -104,11 +107,21 @@ void MainFrame::initializeModelsAndViews()
 	ui.pages404TableView->horizontalHeader()->setDefaultSectionSize(700);
 	ui.pages404TableView->setModel(pages404Model);
 
+	ui.titleDuplicatesTableView->verticalHeader()->hide();
+	ui.titleDuplicatesTableView->horizontalHeader()->setDefaultSectionSize(700);
+	ui.titleDuplicatesTableView->setModel(duplicatedTitlesModel);
+
+
 	CrawlerWorker* worker = new CrawlerWorker;
 	worker->moveToThread(&m_crawlerThread);
 
+
 	VERIFY(connect(&m_crawlerThread, &QThread::finished,
 		worker, &QObject::deleteLater));
+
+	//
+	// model/view connections
+	//
 
 	VERIFY(connect(worker, &CrawlerWorker::signal_addUrl,
 		crawlerModel, &UrlsCrawlerModel::slot_addUrl, Qt::BlockingQueuedConnection));
@@ -119,15 +132,22 @@ void MainFrame::initializeModelsAndViews()
 	VERIFY(connect(worker, &CrawlerWorker::signal_add404Url,
 		pages404Model, &Pages404Model::slot_addUrl, Qt::BlockingQueuedConnection));
 
+	VERIFY(connect(worker, &CrawlerWorker::signal_addDuplicatedTitleUrl,
+		duplicatedTitlesModel, &DuplicatedTitlesModel::slot_addUrl, Qt::BlockingQueuedConnection));
+
+
+
 	VERIFY(connect(worker, &CrawlerWorker::signal_queueSize,
 		this, &MainFrame::slot_queueSize, Qt::BlockingQueuedConnection));
 
 	VERIFY(connect(worker, &CrawlerWorker::signal_DNSError, 
 		this, &MainFrame::slot_DNSError, Qt::QueuedConnection));
 
+
 	//
 	// slot_stopCrawler must execute only atomic operations!
 	//
+
 	VERIFY(connect(this, &MainFrame::signal_stopCrawlerCommand,
 		worker, &CrawlerWorker::slot_stopCrawler, Qt::DirectConnection));
 

@@ -52,6 +52,50 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 
 			break;
 		}
+
+		//
+		// errors handling
+		//
+
+		case IMessage::MessageType::DuplicatedTitle:
+		{
+			const DuplicatedTitleMessage& actualMessage =
+				static_cast<const DuplicatedTitleMessage&>(message);
+
+			emit signal_addDuplicatedTitleUrl(actualMessage.url(), actualMessage.title());
+
+			break;
+		}
+
+		case IMessage::MessageType::DuplicatedDescription:
+		{
+			const DuplicatedDescriptionMessage& actualMessage =
+				static_cast<const DuplicatedDescriptionMessage&>(message);
+
+			emit signal_addDuplicatedTitleUrl(actualMessage.url(), actualMessage.description());
+
+			break;
+		}
+
+		case IMessage::MessageType::EmptyTitle:
+		{
+			const EmptyTitleMessage& actualMessage =
+				static_cast<const EmptyTitleMessage&>(message);
+
+			emit signal_addEmptyTitleUrl(actualMessage.url());
+
+			break;
+		}
+
+		case IMessage::MessageType::EmptyDescription:
+		{
+			const EmptyDescriptionMessage& actualMessage =
+				static_cast<const EmptyDescriptionMessage&>(message);
+
+			emit signal_addEmptyDescriptionUrl(actualMessage.url());
+
+			break;
+		}
 	}
 }
 

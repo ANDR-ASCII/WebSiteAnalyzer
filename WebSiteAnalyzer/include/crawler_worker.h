@@ -24,8 +24,15 @@ public:
 
 	Q_SIGNAL void signal_addUrl(const std::string& url, int responseCode);
 	Q_SIGNAL void signal_addExternalUrl(const std::string& url);
-	Q_SIGNAL void signal_add404Url(const std::string& url);
 	Q_SIGNAL void signal_queueSize(std::size_t size, int queueType);
+
+	Q_SIGNAL void signal_add404Url(const std::string& url);
+	Q_SIGNAL void signal_addEmptyDescriptionUrl(const std::string& url);
+	Q_SIGNAL void signal_addEmptyTitleUrl(const std::string& url);
+
+	Q_SIGNAL void signal_addDuplicatedTitleUrl(const std::string& url, const std::string& title);
+	Q_SIGNAL void signal_addDuplicatedDescriptionUrl(const std::string& url, const std::string& description);
+
 	Q_SIGNAL void signal_DNSError();
 	
 protected:

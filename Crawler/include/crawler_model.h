@@ -40,12 +40,21 @@ public:
 	Queue* queue(int queueType) noexcept;
 	const Queue* queue(int queueType) const noexcept;
 
+	bool duplicateTitle(const Url& url, const std::string& title) const;
+	bool duplicateDescription(const Url& url, const std::string& description) const;
+
+	void addTitle(const Url& url, const std::string& title);
+	void addDescription(const Url& url, const std::string& description);
+
 private:
 	Queue m_internalUrlQueue;
 	Queue m_internalCrawledUrlQueue;
 
 	Queue m_externalUrlQueue;
 	Queue m_externalCrawledUrlQueue;
+
+	std::unordered_map<std::string, Queue> m_duplicatedTitles;
+	std::unordered_map<std::string, Queue> m_duplicatedDescriptions;
 };
 
 }

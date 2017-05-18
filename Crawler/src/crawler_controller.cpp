@@ -4,6 +4,7 @@
 #include "http_connection.h"
 #include "http_request.h"
 #include "http_response.h"
+#include "common.h"
 
 namespace CrawlerImpl
 {
@@ -99,6 +100,67 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			//
 
 			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), url);
+
+			//
+			// Find title tag
+			//
+
+			tagParser.parseTags(response->entityBody(), "title");
+
+			if (!tagParser.size() || (tagParser.size() && tagParser[0].value().empty()))
+			{
+				//
+				// send message about empty title
+				//
+			}
+			else
+			{
+				model()->addTitle(url, tagParser[0].value());
+
+				if (model()->duplicateTitle(url, tagParser[0].value()))
+				{
+					//
+					// send message about duplicated title
+					//
+				}
+			}
+
+			//
+			// Find meta description
+			//
+
+			tagParser.parseTags(response->entityBody(), "meta");
+
+			if (tagParser.size())
+			{
+				auto findDescription = [](const Tag& tag)
+				{
+					return Common::strToLower(tag.attribute("name")) == "description";
+				};
+
+				auto iter = std::find_if(std::begin(tagParser), std::end(tagParser), findDescription);
+
+				if (iter != std::end(tagParser))
+				{
+					if (!iter->attribute("content").empty())
+					{
+						model()->addDescription(url, iter->attribute("content"));
+
+						if (model()->duplicateDescription(url, iter->attribute("content")))
+						{
+							//
+							// send message about duplicated description
+							//
+						}
+					}
+					else
+					{
+						//
+						// send message about empty description
+						//
+					}
+				}
+			}
 		}
 
 		sendMessage(QueueSizeMessage{ CrawlerModel::InternalUrlQueue | CrawlerModel::InternalCrawledUrlQueue, 

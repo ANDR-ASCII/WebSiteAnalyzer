@@ -109,9 +109,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 
 			if (!tagParser.size() || (tagParser.size() && tagParser[0].value().empty()))
 			{
-				//
-				// send message about empty title
-				//
+				sendMessage(EmptyTitleMessage{ url.host() + url.relativePath() });
 			}
 			else
 			{
@@ -119,9 +117,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 
 				if (model()->duplicateTitle(url, tagParser[0].value()))
 				{
-					//
-					// send message about duplicated title
-					//
+					sendMessage(DuplicatedTitleMessage{ url.host() + url.relativePath(), tagParser[0].value() });
 				}
 			}
 
@@ -148,16 +144,12 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 
 						if (model()->duplicateDescription(url, iter->attribute("content")))
 						{
-							//
-							// send message about duplicated description
-							//
+							sendMessage(DuplicatedTitleMessage{ url.host() + url.relativePath(), iter->attribute("content") });
 						}
 					}
 					else
 					{
-						//
-						// send message about empty description
-						//
+						sendMessage(EmptyDescriptionMessage{ url.host() + url.relativePath() });
 					}
 				}
 			}

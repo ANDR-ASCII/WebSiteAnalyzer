@@ -16,7 +16,11 @@ public:
 		CurrentQueueSize,
 		QueueItersAndRefsInvalidated,
 		HttpResponseCode,
-		WarningType
+		WarningType,
+		DuplicatedTitle,
+		DuplicatedDescription,
+		EmptyTitle,
+		EmptyDescription
 	};
 
 	virtual MessageType type() const noexcept = 0;
@@ -160,6 +164,108 @@ public:
 	{
 		return MessageType::DNSError;
 	}
+};
+
+class DuplicatedTitleMessage : public IMessage
+{
+public:
+	DuplicatedTitleMessage(const std::string& url, const std::string& title)
+		: m_url(url)
+		, m_title(title)
+	{
+	}
+
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::DuplicatedTitle;
+	}
+
+	const std::string& url() const noexcept
+	{
+		return m_url;
+	}
+
+	const std::string& title() const noexcept
+	{
+		return m_title;
+	}
+
+private:
+	std::string m_title;
+	std::string m_url;
+};
+
+class DuplicatedDescriptionMessage : public IMessage
+{
+public:
+	DuplicatedDescriptionMessage(const std::string& url, const std::string& description)
+		: m_url(url)
+		, m_description(description)
+	{
+	}
+
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::DuplicatedDescription;
+	}
+
+	const std::string& url() const noexcept
+	{
+		return m_url;
+	}
+
+	const std::string& description() const noexcept
+	{
+		return m_description;
+	}
+
+private:
+	std::string m_description;
+	std::string m_url;
+};
+
+class EmptyTitleMessage : public IMessage
+{
+public:
+	EmptyTitleMessage(const std::string& url)
+		: m_url(url)
+	{
+	}
+
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::EmptyTitle;
+	}
+
+	const std::string& url() const noexcept
+	{
+		return m_url;
+	}
+
+private:
+	std::string m_url;
+};
+
+class EmptyDescriptionMessage : public IMessage
+{
+public:
+	EmptyDescriptionMessage(const std::string& url)
+		: m_url(url)
+	{
+	}
+
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::EmptyDescription;
+	}
+
+	const std::string& url() const noexcept
+	{
+		return m_url;
+	}
+
+private:
+	std::string m_url;
 };
 
 }

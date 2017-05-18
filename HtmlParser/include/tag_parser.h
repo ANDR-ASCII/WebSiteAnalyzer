@@ -37,7 +37,7 @@ public:
 	void parseTags(const std::string& htmlPage, const std::string& tagName, bool parseAttributes = true);
 
 	// parse specified tags with value from first argument
-	void parseTagsWithValue(const std::string& htmlPage, const std::string& tagName, bool parseAttributes = true);
+	void parseTagsWithValues(const std::string& htmlPage, const std::string& tagName, bool parseAttributes = true);
 
 	std::size_t size() const;
 	std::size_t countTag(const std::string& tag) const;

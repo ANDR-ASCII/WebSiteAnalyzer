@@ -198,7 +198,7 @@ void TagParser::parseTags(const std::string& htmlPage, const std::string& tagNam
 }
 
 // parse specified tags with value from first argument
-void TagParser::parseTagsWithValue(const std::string& htmlPage, const std::string& tagName, bool parseAttributes)
+void TagParser::parseTagsWithValues(const std::string& htmlPage, const std::string& tagName, bool parseAttributes)
 {
 	D_FUNCTION(TagParser);
 
@@ -219,6 +219,11 @@ void TagParser::parseTagsWithValue(const std::string& htmlPage, const std::strin
 		Tag tmpTag;
 		tagText = d_pointer->readTag(htmlPage, position);
 
+		if (Common::strToLower(d_pointer->tagName(tagText)).empty())
+		{
+			break;
+		}
+
 		if (Common::strToLower(d_pointer->tagName(tagText)) == nameTagCmp)
 		{
 			tmpTag.setName(nameTagCmp);
@@ -226,7 +231,16 @@ void TagParser::parseTagsWithValue(const std::string& htmlPage, const std::strin
 			// if need parse attributes of tag
 			if (parseAttributes)
 			{
-				tmpTag.setAttributes(d_pointer->readAllTagAttributes(tagText));
+				try
+				{
+					tmpTag.setAttributes(d_pointer->readAllTagAttributes(tagText));
+				}
+				catch (const std::logic_error&)
+				{
+					//
+					// TODO
+					//
+				}
 			}
 
 			tmpTag.setValue(d_pointer->readAllUpToTag(htmlPage, "/" + d_pointer->tagName(tagText), position));

@@ -105,7 +105,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			// Find title tag
 			//
 
-			tagParser.parseTags(response->entityBody(), "title");
+			tagParser.parseTagsWithValues(response->entityBody(), "title");
 
 			if (!tagParser.size() || (tagParser.size() && tagParser[0].value().empty()))
 			{
@@ -113,6 +113,9 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			}
 			else
 			{
+				const bool test = url.relativePath() == "/vorota/promyshlennye/doorhan/panoramnye-isd02" ||
+					url.relativePath() == "/vorota/promyshlennye/doorhan/sektsionnye-isd01";
+
 				model()->addTitle(url, tagParser[0].value());
 
 				if (model()->duplicateTitle(url, tagParser[0].value()))

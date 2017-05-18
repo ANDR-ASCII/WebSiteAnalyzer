@@ -15,7 +15,6 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 	{
 		try
 		{
-
 			currentUrl.parse(tag.attribute("href"));
 
 			if (!currentUrl.file().empty() && 
@@ -136,8 +135,14 @@ const CrawlerModel::Queue* CrawlerModel::queue(int queueType) const noexcept
 
 bool CrawlerModel::duplicateTitle(const Url& url, const std::string& title) const
 {
-	const Queue& queue = m_duplicatedTitles.find(title)->second;
-	return std::find(std::begin(queue), std::end(queue), url.relativePath()) != std::end(queue);
+	auto iter = m_duplicatedTitles.find(title);
+
+	if (iter != std::end(m_duplicatedTitles))
+	{
+		return iter->second.size() > 1;
+	}
+
+	return false;
 }
 
 bool CrawlerModel::duplicateDescription(const Url& url, const std::string& description) const

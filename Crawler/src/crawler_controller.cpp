@@ -85,6 +85,9 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			response->is_302_MovedTemporarily())
 		{
 			handleRedirection(response, request);
+
+			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), std::string(), std::string(),
+				response->responseCode(), CrawlerModel::InternalCrawledUrlQueue });
 		}
 		else
 		{
@@ -112,19 +115,19 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			{
 				title = tagParser[0].value();
 
-				model()->addTitle(url, tagParser[0].value());
+				model()->addTitle(url, title);
 
-				if (model()->isDuplicatedTitle(url, tagParser[0].value()))
+				if (model()->isDuplicatedTitle(url, title))
 				{
-					if (model()->duplicatesTitle(url, tagParser[0].value()) == 2)
+					if (model()->duplicatesTitle(url, title) == 2)
 					{
 						sendMessage(DuplicatedTitleMessage{ 
-							settings()->startUrlAddress().host() + model()->firstDuplicatedTitle(tagParser[0].value()),
-							tagParser[0].value() 
+							settings()->startUrlAddress().host() + model()->firstDuplicatedTitle(title),
+							title
 						});
 					}
 
-					sendMessage(DuplicatedTitleMessage{ settings()->startUrlAddress().host() + url.relativePath(), tagParser[0].value() });
+					sendMessage(DuplicatedTitleMessage{ settings()->startUrlAddress().host() + url.relativePath(), title });
 				}
 			}
 

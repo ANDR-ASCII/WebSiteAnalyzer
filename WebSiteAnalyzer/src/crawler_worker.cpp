@@ -72,7 +72,7 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 			const DuplicatedDescriptionMessage& actualMessage =
 				static_cast<const DuplicatedDescriptionMessage&>(message);
 
-			emit signal_addDuplicatedTitleUrl(actualMessage.url(), actualMessage.description());
+			emit signal_addDuplicatedDescriptionUrl(actualMessage.url(), actualMessage.description());
 
 			break;
 		}

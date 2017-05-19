@@ -56,13 +56,12 @@ void MainFrame::slot_queueSize(std::size_t size, int queueType)
 		ui.externalUrlsCountLabel->setText(QString().setNum(static_cast<int>(size)));
 	}
 
-	double remainder = ui.amountLabel->text().toDouble() + 1;
+	double amount = ui.amountLabel->text().toDouble() + 1;
 	double crawled = ui.crawledCountLabel->text().toDouble() + 1;
 
-	double percent = (remainder + crawled) / 100;
-	double divider = !percent ? percent + 1 : percent;
+	double percent = amount / 100;
 
-	ui.progressBar->setValue(crawled / divider);
+	ui.progressBar->setValue(crawled / (percent ? percent : percent + 1));
 }
 
 void MainFrame::slot_DNSError()
@@ -100,15 +99,15 @@ void MainFrame::initializeModelsAndViews()
 	ui.crawlerTableView->setModel(crawlerModel);
 
 	ui.externalUrlsTableView->verticalHeader()->hide();
-	ui.externalUrlsTableView->horizontalHeader()->setDefaultSectionSize(700);
+	ui.externalUrlsTableView->horizontalHeader()->setDefaultSectionSize(600);
 	ui.externalUrlsTableView->setModel(externalUrlsModel);
 
 	ui.pages404TableView->verticalHeader()->hide();
-	ui.pages404TableView->horizontalHeader()->setDefaultSectionSize(700);
+	ui.pages404TableView->horizontalHeader()->setDefaultSectionSize(600);
 	ui.pages404TableView->setModel(pages404Model);
 
 	ui.titleDuplicatesTableView->verticalHeader()->hide();
-	ui.titleDuplicatesTableView->horizontalHeader()->setDefaultSectionSize(700);
+	ui.titleDuplicatesTableView->horizontalHeader()->setDefaultSectionSize(600);
 	ui.titleDuplicatesTableView->setModel(duplicatedTitlesModel);
 
 

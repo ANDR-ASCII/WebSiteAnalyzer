@@ -6,9 +6,13 @@ namespace WebSiteAnalyzer
 UrlsCrawlerModel::UrlsCrawlerModel(QObject* parent)
 	: QAbstractTableModel(parent)
 {
+	QTextCodec* codec = QTextCodec::codecForLocale();
+
 	m_headerData 
 		<< "URL" 
-		<< "HTTP Response Code";
+		<< codec->toUnicode("Заголовок страницы")
+		<< codec->toUnicode("Метаописание страницы")
+		<< codec->toUnicode("Код ответа сервера");
 }
 
 int UrlsCrawlerModel::rowCount(const QModelIndex& parent) const
@@ -39,19 +43,27 @@ QVariant UrlsCrawlerModel::data(const QModelIndex& index, int role) const
 	{
 		assert(index.row() < static_cast<int>(m_urls.size()));
 
-		const std::pair<QString, int>& pair = m_urls[index.row()];
-
-		return QVariant(index.column() == 0 ? pair.first : QString().setNum(pair.second));
+		return QVariant(m_urls[index.row()][index.column()]);
 	}
 
 	return QVariant();
 }
 
-void UrlsCrawlerModel::slot_addUrl(const std::string& url, int responseCode)
+void UrlsCrawlerModel::slot_addUrl(const std::string& url, const std::string& title, const std::string& description, int responseCode)
 {
+	QTextCodec* codec = QTextCodec::codecForLocale();
+
 	beginResetModel();
 
-	m_urls.push_front(std::make_pair(QString(url.c_str()), responseCode));
+	std::array<QString, 4> temporaryRow
+	{
+		codec->toUnicode(url.c_str()),
+		title.c_str(),
+		description.c_str(),
+		QString().setNum(responseCode)
+	};
+
+	m_urls.push_front(std::move(temporaryRow));
 
 	endResetModel();
 }

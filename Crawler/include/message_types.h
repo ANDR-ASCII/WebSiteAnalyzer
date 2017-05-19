@@ -124,8 +124,10 @@ private:
 class UrlMessage : public IMessage
 {
 public:
-	UrlMessage(const std::string& url, int responseCode, int queueType)
+	UrlMessage(const std::string& url, const std::string& title, const std::string& description, int responseCode, int queueType)
 		: m_url(url)
+		, m_title(title)
+		, m_description(description)
 		, m_responseCode(responseCode)
 		, m_queueType(queueType)
 	{
@@ -134,6 +136,16 @@ public:
 	const std::string& url() const noexcept
 	{
 		return m_url;
+	}
+
+	const std::string& title() const noexcept
+	{
+		return m_title;
+	}
+
+	const std::string& description() const noexcept
+	{
+		return m_description;
 	}
 
 	int responseCode() const noexcept
@@ -153,6 +165,8 @@ public:
 
 private:
 	std::string m_url;
+	std::string m_title;
+	std::string m_description;
 	int m_responseCode;
 	int m_queueType;
 };

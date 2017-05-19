@@ -31,7 +31,7 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 				emit signal_add404Url(actualMessage.url());
 			}
 			
-			emit signal_addUrl(actualMessage.url(), actualMessage.responseCode());
+			emit signal_addUrl(actualMessage.url(), actualMessage.title(), actualMessage.description(), actualMessage.responseCode());
 
 			break;
 		}

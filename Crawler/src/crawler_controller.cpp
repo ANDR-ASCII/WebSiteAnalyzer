@@ -86,7 +86,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 		{
 			handleRedirection(response, request);
 
-			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), std::string(), std::string(),
+			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), std::string(), std::string(), std::string(),
 				response->responseCode(), CrawlerModel::InternalCrawledUrlQueue });
 		}
 		else
@@ -136,6 +136,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			//
 
 			std::string destricption;
+			std::string charset;
 
 			tagParser.parseTags(response->entityBody(), "meta");
 
@@ -146,11 +147,17 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 					return Common::strToLower(tag.attribute("name")) == "description";
 				};
 
-				auto iter = std::find_if(std::begin(tagParser), std::end(tagParser), findDescription);
-
-				if (iter != std::end(tagParser))
+				auto findCharset = [](const Tag& tag)
 				{
-					destricption = iter->attribute("content");
+					return Common::strToLower(tag.attribute("http-equiv")) == "content-type";
+				};
+
+				auto iterDescription = std::find_if(std::begin(tagParser), std::end(tagParser), findDescription);
+				auto iterCharset = std::find_if(std::begin(tagParser), std::end(tagParser), findCharset);
+
+				if (iterDescription != std::end(tagParser))
+				{
+					destricption = iterDescription->attribute("content");
 
 					if (!destricption.empty())
 					{
@@ -162,7 +169,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 							{
 								sendMessage(DuplicatedDescriptionMessage{
 									settings()->startUrlAddress().host() + model()->firstDuplicatedDescription(destricption),
-									iter->attribute("content")
+									iterDescription->attribute("content")
 								});
 							}
 
@@ -174,9 +181,14 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 						sendMessage(EmptyDescriptionMessage{ url.host() + url.relativePath() });
 					}
 				}
+
+				if (iterCharset != std::end(tagParser))
+				{
+					charset = iterCharset->attribute("content");
+				}
 			}
 
-			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), title, destricption,
+			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), title, destricption, charset,
 				response->responseCode(), CrawlerModel::InternalCrawledUrlQueue });
 		}
 

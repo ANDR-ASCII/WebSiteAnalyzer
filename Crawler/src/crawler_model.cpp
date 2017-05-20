@@ -30,7 +30,7 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 				{
 					storeUrl(currentUrl, ExternalUrlQueue);
 
-					sendMessage(UrlMessage{ currentUrl.host(), std::string(), std::string(), 200, CrawlerModel::ExternalUrlQueue });
+					sendMessage(UrlMessage{ currentUrl.host(), std::string(), std::string(), std::string(), 200, CrawlerModel::ExternalUrlQueue });
 				}
 
 				continue;

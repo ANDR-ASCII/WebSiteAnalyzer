@@ -18,7 +18,12 @@ public:
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 	virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-	Q_SLOT void slot_addUrl(const std::string& url, const std::string& title, const std::string& description, int responseCode);
+	Q_SLOT void slot_addUrl(const std::string& url, 
+		const std::string& title, 
+		const std::string& description, 
+		const std::string& charset, 
+		int responseCode
+	);
 
 private:
 	std::deque<std::array<QString, 4>> m_urls;

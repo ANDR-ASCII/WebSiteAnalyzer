@@ -49,8 +49,14 @@ QVariant UrlsCrawlerModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
-void UrlsCrawlerModel::slot_addUrl(const std::string& url, const std::string& title, const std::string& description, int responseCode)
+void UrlsCrawlerModel::slot_addUrl(const std::string& url, 
+	const std::string& title, 
+	const std::string& description, 
+	const std::string& charset, 
+	int responseCode)
 {
+	const bool isUtf8 = charset.find("utf-8") != std::string::npos;
+
 	QTextCodec* codec = QTextCodec::codecForLocale();
 
 	beginResetModel();
@@ -58,8 +64,8 @@ void UrlsCrawlerModel::slot_addUrl(const std::string& url, const std::string& ti
 	std::array<QString, 4> temporaryRow
 	{
 		codec->toUnicode(url.c_str()),
-		title.c_str(),
-		description.c_str(),
+		isUtf8 ? title.c_str() : codec->toUnicode(title.c_str()),
+		isUtf8 ? description.c_str() : codec->toUnicode(description.c_str()),
 		QString().setNum(responseCode)
 	};
 

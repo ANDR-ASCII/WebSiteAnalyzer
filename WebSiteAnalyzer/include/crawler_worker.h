@@ -22,7 +22,13 @@ public:
 	Q_SLOT void slot_startCrawler(CrawlerSettings* settings);
 	Q_SLOT void slot_stopCrawler();
 
-	Q_SIGNAL void signal_addUrl(const std::string& url, const std::string& title, const std::string& description, int responseCode);
+	Q_SIGNAL void signal_addUrl(const std::string& url, 
+		const std::string& title, 
+		const std::string& description, 
+		const std::string& charset, 
+		int responseCode
+	);
+
 	Q_SIGNAL void signal_addExternalUrl(const std::string& url);
 	Q_SIGNAL void signal_queueSize(std::size_t size, int queueType);
 

@@ -6,9 +6,11 @@ namespace WebSiteAnalyzer
 DuplicatedTitlesModel::DuplicatedTitlesModel(QObject* parent)
 	: QAbstractTableModel(parent)
 {
+	QTextCodec* codec = QTextCodec::codecForLocale();
+
 	m_headerData
 		<< "URL"
-		<< "Title";
+		<< codec->toUnicode("Заголовок страницы");
 }
 
 int DuplicatedTitlesModel::rowCount(const QModelIndex& parent) const
@@ -47,11 +49,19 @@ QVariant DuplicatedTitlesModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
-void DuplicatedTitlesModel::slot_addUrl(const std::string& url, const std::string& title)
+void DuplicatedTitlesModel::slot_addUrl(const std::string& url, const std::string& title, const std::string& charset)
 {
+	const bool isUtf8 = charset.find("utf-8") != std::string::npos;
+	QTextCodec* codec = QTextCodec::codecForLocale();
+
 	beginResetModel();
 
-	m_urlTitlePairs.push_front(std::make_pair(QString(url.c_str()), QString(title.c_str())));
+	auto pair = std::make_pair(
+		isUtf8 ? QString(url.c_str()) : QString(codec->toUnicode(url.c_str())),
+		isUtf8 ? QString(title.c_str()) : QString(codec->toUnicode(title.c_str()))
+	);
+
+	m_urlTitlePairs.push_front(std::move(pair));
 
 	endResetModel();
 }

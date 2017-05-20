@@ -126,7 +126,7 @@ QTabWidget QWidget #QListView
       </property>
       <widget class="QTabWidget" name="infoWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="crawlerTab">
         <property name="styleSheet">

@@ -14,7 +14,6 @@ public:
 		Url,
 		DNSError,
 		CurrentQueueSize,
-		QueueItersAndRefsInvalidated,
 		HttpResponseCode,
 		WarningType,
 		DuplicatedTitle,
@@ -68,28 +67,6 @@ public:
 
 private:
 	int m_codeResponse;
-};
-
-class QueueItersAndRefsInvalidatedMessage : public IMessage
-{
-public:
-	QueueItersAndRefsInvalidatedMessage(int queueType)
-		: m_queueType(queueType)
-	{
-	}
-
-	virtual MessageType type() const noexcept override
-	{
-		return MessageType::QueueItersAndRefsInvalidated;
-	}
-
-	int queueType() const noexcept
-	{
-		return m_queueType;
-	}
-
-private:
-	int m_queueType;
 };
 
 class QueueSizeMessage : public IMessage
@@ -195,9 +172,10 @@ public:
 class DuplicatedTitleMessage : public IMessage
 {
 public:
-	DuplicatedTitleMessage(const std::string& url, const std::string& title)
+	DuplicatedTitleMessage(const std::string& url, const std::string& title, const std::string& charset)
 		: m_url(url)
 		, m_title(title)
+		, m_charset(charset)
 	{
 	}
 
@@ -216,17 +194,24 @@ public:
 		return m_title;
 	}
 
+	const std::string& charset() const noexcept
+	{
+		return m_charset;
+	}
+
 private:
-	std::string m_title;
 	std::string m_url;
+	std::string m_title;
+	std::string m_charset;
 };
 
 class DuplicatedDescriptionMessage : public IMessage
 {
 public:
-	DuplicatedDescriptionMessage(const std::string& url, const std::string& description)
+	DuplicatedDescriptionMessage(const std::string& url, const std::string& description, const std::string& charset)
 		: m_url(url)
 		, m_description(description)
+		, m_charset(charset)
 	{
 	}
 
@@ -245,9 +230,15 @@ public:
 		return m_description;
 	}
 
+	const std::string& charset() const noexcept
+	{
+		return m_charset;
+	}
+
 private:
-	std::string m_description;
 	std::string m_url;
+	std::string m_description;
+	std::string m_charset;
 };
 
 class EmptyTitleMessage : public IMessage

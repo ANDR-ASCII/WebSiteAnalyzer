@@ -6,6 +6,7 @@
 #include "urls_crawler_model.h"
 #include "pages_404_model.h"
 #include "duplicated_titles_model.h"
+#include "duplicated_descriptions_model.h"
 
 namespace WebSiteAnalyzer
 {
@@ -89,26 +90,35 @@ void MainFrame::initializeModelsAndViews()
 	ExternalUrlsModel* externalUrlsModel = new ExternalUrlsModel(ui.crawlerTableView);
 	Pages404Model* pages404Model = new Pages404Model(ui.pages404TableView);
 	DuplicatedTitlesModel* duplicatedTitlesModel = new DuplicatedTitlesModel(ui.titleDuplicatesTableView);
-
+	DuplicatedDescriptionsModel* duplicatedDescriptionsModel = new DuplicatedDescriptionsModel(ui.descriptionDuplicatesTableView);
 
 	ui.progressBar->setValue(0);
 	ui.progressBar->hide();
+
 
 	ui.crawlerTableView->verticalHeader()->hide();
 	ui.crawlerTableView->horizontalHeader()->setDefaultSectionSize(ui.crawlerTableView->width() / crawlerModel->columnCount());
 	ui.crawlerTableView->setModel(crawlerModel);
 
+
 	ui.externalUrlsTableView->verticalHeader()->hide();
 	ui.externalUrlsTableView->horizontalHeader()->setDefaultSectionSize(600);
 	ui.externalUrlsTableView->setModel(externalUrlsModel);
+
 
 	ui.pages404TableView->verticalHeader()->hide();
 	ui.pages404TableView->horizontalHeader()->setDefaultSectionSize(600);
 	ui.pages404TableView->setModel(pages404Model);
 
+
 	ui.titleDuplicatesTableView->verticalHeader()->hide();
 	ui.titleDuplicatesTableView->horizontalHeader()->setDefaultSectionSize(600);
 	ui.titleDuplicatesTableView->setModel(duplicatedTitlesModel);
+
+
+	ui.descriptionDuplicatesTableView->verticalHeader()->hide();
+	ui.descriptionDuplicatesTableView->horizontalHeader()->setDefaultSectionSize(600);
+	ui.descriptionDuplicatesTableView->setModel(duplicatedDescriptionsModel);
 
 
 	CrawlerWorker* worker = new CrawlerWorker;
@@ -133,6 +143,9 @@ void MainFrame::initializeModelsAndViews()
 
 	VERIFY(connect(worker, &CrawlerWorker::signal_addDuplicatedTitleUrl,
 		duplicatedTitlesModel, &DuplicatedTitlesModel::slot_addUrl, Qt::BlockingQueuedConnection));
+
+	VERIFY(connect(worker, &CrawlerWorker::signal_addDuplicatedDescriptionUrl,
+		duplicatedDescriptionsModel, &DuplicatedDescriptionsModel::slot_addUrl, Qt::BlockingQueuedConnection));
 
 
 

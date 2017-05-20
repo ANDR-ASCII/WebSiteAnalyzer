@@ -73,6 +73,10 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 				sendMessage(DNSErrorMessage{});
 				break;
 			}
+
+			//
+			// TODO: need to handle timeout
+			//
 		}
 
 		if (!response->isValid())
@@ -84,10 +88,10 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 		if (response->is_301_MovedPermanently() ||
 			response->is_302_MovedTemporarily())
 		{
-			handleRedirection(response, request);
-
 			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), std::string(), std::string(), std::string(),
 				response->responseCode(), CrawlerModel::InternalCrawledUrlQueue });
+
+			handleRedirection(response, request);
 		}
 		else
 		{
@@ -98,6 +102,64 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			//
 
 			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), url);
+
+			//
+			// Find meta description
+			//
+
+			std::string description;
+			std::string charset;
+
+			tagParser.parseTags(response->entityBody(), "meta");
+
+			if (tagParser.size())
+			{
+				auto findDescription = [](const Tag& tag)
+				{
+					return Common::strToLower(tag.attribute("name")) == "description";
+				};
+
+				auto findCharset = [](const Tag& tag)
+				{
+					return Common::strToLower(tag.attribute("http-equiv")) == "content-type";
+				};
+
+				auto iterDescription = std::find_if(std::begin(tagParser), std::end(tagParser), findDescription);
+				auto iterCharset = std::find_if(std::begin(tagParser), std::end(tagParser), findCharset);
+
+				if (iterCharset != std::end(tagParser))
+				{
+					charset = iterCharset->attribute("content");
+				}
+
+				if (iterDescription != std::end(tagParser))
+				{
+					description = iterDescription->attribute("content");
+
+					if (!description.empty())
+					{
+						model()->addDescription(url, description);
+
+						if (model()->isDuplicatedDescription(url, description))
+						{
+							if (model()->duplicatesDescription(url, description) == 2)
+							{
+								sendMessage(DuplicatedDescriptionMessage{
+									settings()->startUrlAddress().host() + model()->firstDuplicatedDescription(description),
+									description,
+									charset
+								});
+							}
+
+							sendMessage(DuplicatedDescriptionMessage{ settings()->startUrlAddress().host() + url.relativePath(), description, charset });
+						}
+					}
+					else
+					{
+						sendMessage(EmptyDescriptionMessage{ url.host() + url.relativePath() });
+					}
+				}
+			}
 
 			//
 			// Find title tag
@@ -121,74 +183,14 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 				{
 					if (model()->duplicatesTitle(url, title) == 2)
 					{
-						sendMessage(DuplicatedTitleMessage{ 
-							settings()->startUrlAddress().host() + model()->firstDuplicatedTitle(title),
-							title
-						});
+						sendMessage(DuplicatedTitleMessage{ settings()->startUrlAddress().host() + model()->firstDuplicatedTitle(title), title, charset });
 					}
 
-					sendMessage(DuplicatedTitleMessage{ settings()->startUrlAddress().host() + url.relativePath(), title });
+					sendMessage(DuplicatedTitleMessage{ settings()->startUrlAddress().host() + url.relativePath(), title, charset });
 				}
 			}
 
-			//
-			// Find meta description
-			//
-
-			std::string destricption;
-			std::string charset;
-
-			tagParser.parseTags(response->entityBody(), "meta");
-
-			if (tagParser.size())
-			{
-				auto findDescription = [](const Tag& tag)
-				{
-					return Common::strToLower(tag.attribute("name")) == "description";
-				};
-
-				auto findCharset = [](const Tag& tag)
-				{
-					return Common::strToLower(tag.attribute("http-equiv")) == "content-type";
-				};
-
-				auto iterDescription = std::find_if(std::begin(tagParser), std::end(tagParser), findDescription);
-				auto iterCharset = std::find_if(std::begin(tagParser), std::end(tagParser), findCharset);
-
-				if (iterDescription != std::end(tagParser))
-				{
-					destricption = iterDescription->attribute("content");
-
-					if (!destricption.empty())
-					{
-						model()->addDescription(url, destricption);
-
-						if (model()->isDuplicatedDescription(url, destricption))
-						{
-							if (model()->duplicatesDescription(url, destricption) == 2)
-							{
-								sendMessage(DuplicatedDescriptionMessage{
-									settings()->startUrlAddress().host() + model()->firstDuplicatedDescription(destricption),
-									iterDescription->attribute("content")
-								});
-							}
-
-							sendMessage(DuplicatedDescriptionMessage{ settings()->startUrlAddress().host() + url.relativePath(), destricption });
-						}
-					}
-					else
-					{
-						sendMessage(EmptyDescriptionMessage{ url.host() + url.relativePath() });
-					}
-				}
-
-				if (iterCharset != std::end(tagParser))
-				{
-					charset = iterCharset->attribute("content");
-				}
-			}
-
-			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), title, destricption, charset,
+			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), title, description, charset,
 				response->responseCode(), CrawlerModel::InternalCrawledUrlQueue });
 		}
 
@@ -227,6 +229,8 @@ void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response,
 	{
 		settings()->setHost(url);
 		request.setHost(url.host());
+
+		model()->queue(CrawlerModel::InternalCrawledUrlQueue)->clear();
 
 		if (!model()->isItemExistsIn(url, CrawlerModel::InternalCrawledUrlQueue))
 		{

@@ -36,8 +36,8 @@ public:
 	Q_SIGNAL void signal_addEmptyDescriptionUrl(const std::string& url);
 	Q_SIGNAL void signal_addEmptyTitleUrl(const std::string& url);
 
-	Q_SIGNAL void signal_addDuplicatedTitleUrl(const std::string& url, const std::string& title);
-	Q_SIGNAL void signal_addDuplicatedDescriptionUrl(const std::string& url, const std::string& description);
+	Q_SIGNAL void signal_addDuplicatedTitleUrl(const std::string& url, const std::string& title, const std::string& charset);
+	Q_SIGNAL void signal_addDuplicatedDescriptionUrl(const std::string& url, const std::string& description, const std::string& charset);
 
 	Q_SIGNAL void signal_DNSError();
 	

@@ -101,6 +101,13 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 
 			break;
 		}
+
+		case IMessage::MessageType::ProgressStopped:
+		{
+			emit signal_progressStopped();
+
+			break;
+		}
 	}
 }
 

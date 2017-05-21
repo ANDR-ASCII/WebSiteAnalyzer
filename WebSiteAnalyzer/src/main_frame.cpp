@@ -172,9 +172,11 @@ void MainFrame::initializeModelsAndViews()
 	VERIFY(connect(worker, &CrawlerWorker::signal_queueSize,
 		this, &MainFrame::slot_queueSize, Qt::BlockingQueuedConnection));
 
-	VERIFY(connect(worker, &CrawlerWorker::signal_DNSError, 
+	VERIFY(connect(worker, &CrawlerWorker::signal_DNSError,
 		this, &MainFrame::slot_DNSError, Qt::QueuedConnection));
-
+	
+	VERIFY(connect(worker, &CrawlerWorker::signal_progressStopped,
+		ui.progressBar, &QProgressBar::hide, Qt::QueuedConnection));
 
 	//
 	// slot_stopCrawler must execute only atomic operations!

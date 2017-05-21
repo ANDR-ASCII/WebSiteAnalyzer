@@ -81,13 +81,15 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 
 		if (!response->isValid())
 		{
-			sendMessage(WarningMessage{ "Invalid response of server" });
 			continue;
 		}
 
 		if (response->is_404_NotFound())
 		{
+			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), std::string(), std::string(), std::string(),
+				response->responseCode(), CrawlerModel::InternalCrawledUrlQueue });
 
+			continue;
 		}
 
 		if (response->is_301_MovedPermanently() ||
@@ -103,7 +105,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			tagParser.parseTags(response->entityBody(), "a");
 
 			//
-			// TODO: remove from tagParser all HTTPS urls
+			// TODO: refer to external urls which is not in an external queue urls and check validness of them
 			//
 
 			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), url);
@@ -159,10 +161,11 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 							sendMessage(DuplicatedDescriptionMessage{ settings()->startUrlAddress().host() + url.relativePath(), description, charset });
 						}
 					}
-					else
-					{
-						sendMessage(EmptyDescriptionMessage{ settings()->startUrlAddress().host() + url.relativePath() });
-					}
+				}
+
+				if (description.empty())
+				{
+					sendMessage(EmptyDescriptionMessage{ settings()->startUrlAddress().host() + url.relativePath() });
 				}
 			}
 
@@ -207,7 +210,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 		sendMessage(QueueSizeMessage{ CrawlerModel::ExternalUrlQueue, model()->size(CrawlerModel::ExternalUrlQueue) });
 	}
 
-	sendMessage(WarningMessage{ "Crawling ended up!" });
+	sendMessage(ProgressStoppedMessage{});
 }
 
 void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response, HttpLib::HttpRequest& request)

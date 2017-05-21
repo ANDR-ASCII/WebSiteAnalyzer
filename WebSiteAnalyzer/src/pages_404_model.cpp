@@ -3,7 +3,7 @@
 namespace WebSiteAnalyzer
 {
 
-	Pages404Model::Pages404Model(QObject* parent)
+Pages404Model::Pages404Model(QObject* parent)
 	: QAbstractTableModel(parent)
 {
 	m_headerData << "URL";

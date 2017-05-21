@@ -19,10 +19,24 @@ public:
 		DuplicatedTitle,
 		DuplicatedDescription,
 		EmptyTitle,
-		EmptyDescription
+		EmptyDescription,
+		ProgressStopped
 	};
 
 	virtual MessageType type() const noexcept = 0;
+};
+
+class ProgressStoppedMessage : public IMessage
+{
+public:
+	ProgressStoppedMessage()
+	{
+	}
+
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::ProgressStopped;
+	}
 };
 
 class WarningMessage : public IMessage

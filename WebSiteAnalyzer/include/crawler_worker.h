@@ -40,6 +40,7 @@ public:
 	Q_SIGNAL void signal_addDuplicatedDescriptionUrl(const std::string& url, const std::string& description, const std::string& charset);
 
 	Q_SIGNAL void signal_DNSError();
+	Q_SIGNAL void signal_progressStopped();
 	
 protected:
 	virtual void receiveMessage(const IMessage& message);

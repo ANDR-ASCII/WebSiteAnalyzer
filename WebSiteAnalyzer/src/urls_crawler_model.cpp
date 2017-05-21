@@ -63,7 +63,7 @@ void UrlsCrawlerModel::slot_addUrl(const std::string& url,
 
 	std::array<QString, 4> temporaryRow
 	{
-		codec->toUnicode(url.c_str()),
+		url.c_str(),
 		isUtf8 ? title.c_str() : codec->toUnicode(title.c_str()),
 		isUtf8 ? description.c_str() : codec->toUnicode(description.c_str()),
 		QString().setNum(responseCode)

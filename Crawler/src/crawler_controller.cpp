@@ -85,6 +85,11 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			continue;
 		}
 
+		if (response->is_404_NotFound())
+		{
+
+		}
+
 		if (response->is_301_MovedPermanently() ||
 			response->is_302_MovedTemporarily())
 		{
@@ -156,7 +161,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 					}
 					else
 					{
-						sendMessage(EmptyDescriptionMessage{ url.host() + url.relativePath() });
+						sendMessage(EmptyDescriptionMessage{ settings()->startUrlAddress().host() + url.relativePath() });
 					}
 				}
 			}
@@ -171,7 +176,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 
 			if (!tagParser.size() || (tagParser.size() && tagParser[0].value().empty()))
 			{
-				sendMessage(EmptyTitleMessage{ url.host() + url.relativePath() });
+				sendMessage(EmptyTitleMessage{ settings()->startUrlAddress().host() + url.relativePath() });
 			}
 			else
 			{

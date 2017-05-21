@@ -7,6 +7,10 @@
 #include "pages_404_model.h"
 #include "duplicated_titles_model.h"
 #include "duplicated_descriptions_model.h"
+#include "empty_descriptions_model.h"
+#include "empty_titles_model.h"
+
+
 
 namespace WebSiteAnalyzer
 {
@@ -91,6 +95,8 @@ void MainFrame::initializeModelsAndViews()
 	Pages404Model* pages404Model = new Pages404Model(ui.pages404TableView);
 	DuplicatedTitlesModel* duplicatedTitlesModel = new DuplicatedTitlesModel(ui.titleDuplicatesTableView);
 	DuplicatedDescriptionsModel* duplicatedDescriptionsModel = new DuplicatedDescriptionsModel(ui.descriptionDuplicatesTableView);
+	EmptyDescriptionsModel* emptyDescriptionsModel = new EmptyDescriptionsModel(ui.missingDescriptionTableView);
+	EmptyTitlesModel* emptyTitlesModel = new EmptyTitlesModel(ui.missingTitleTableView);
 
 	ui.progressBar->setValue(0);
 	ui.progressBar->hide();
@@ -120,6 +126,14 @@ void MainFrame::initializeModelsAndViews()
 	ui.descriptionDuplicatesTableView->horizontalHeader()->setDefaultSectionSize(600);
 	ui.descriptionDuplicatesTableView->setModel(duplicatedDescriptionsModel);
 
+	ui.missingDescriptionTableView->verticalHeader()->hide();
+	ui.missingDescriptionTableView->horizontalHeader()->setDefaultSectionSize(600);
+	ui.missingDescriptionTableView->setModel(emptyDescriptionsModel);
+
+	ui.missingTitleTableView->verticalHeader()->hide();
+	ui.missingTitleTableView->horizontalHeader()->setDefaultSectionSize(600);
+	ui.missingTitleTableView->setModel(emptyTitlesModel);
+
 
 	CrawlerWorker* worker = new CrawlerWorker;
 	worker->moveToThread(&m_crawlerThread);
@@ -146,6 +160,12 @@ void MainFrame::initializeModelsAndViews()
 
 	VERIFY(connect(worker, &CrawlerWorker::signal_addDuplicatedDescriptionUrl,
 		duplicatedDescriptionsModel, &DuplicatedDescriptionsModel::slot_addUrl, Qt::BlockingQueuedConnection));
+
+	VERIFY(connect(worker, &CrawlerWorker::signal_addEmptyDescriptionUrl,
+		emptyDescriptionsModel, &EmptyDescriptionsModel::slot_addUrl, Qt::BlockingQueuedConnection));
+
+	VERIFY(connect(worker, &CrawlerWorker::signal_addEmptyTitleUrl,
+		emptyTitlesModel, &EmptyTitlesModel::slot_addUrl, Qt::BlockingQueuedConnection));
 
 
 

@@ -126,7 +126,7 @@ QTabWidget QWidget #QListView
       </property>
       <widget class="QTabWidget" name="infoWidget">
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="crawlerTab">
         <property name="styleSheet">
@@ -197,7 +197,7 @@ QTabWidget QWidget #QListView
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_7">
          <item>
-          <widget class="QListView" name="missingTitleListView"/>
+          <widget class="QTableView" name="missingTitleTableView"/>
          </item>
         </layout>
        </widget>
@@ -207,7 +207,7 @@ QTabWidget QWidget #QListView
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <item>
-          <widget class="QListView" name="missingDescriptionListView"/>
+          <widget class="QTableView" name="missingDescriptionTableView"/>
          </item>
         </layout>
        </widget>

@@ -41,6 +41,15 @@ QVariant EmptyDescriptionsModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
+bool EmptyDescriptionsModel::removeRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
+{
+	beginResetModel();
+	m_urls.clear();
+	endResetModel();
+
+	return true;
+}
+
 void EmptyDescriptionsModel::slot_addUrl(const std::string& url)
 {
 	beginResetModel();

@@ -19,7 +19,9 @@ class CrawlerWorker
 public:
 	CrawlerWorker();
 
-	Q_SLOT void slot_startCrawler(CrawlerSettings* settings);
+	bool isStopped() const;
+
+	Q_SLOT void slot_startCrawler(CrawlerSettings* settings, bool aboutToContinue);
 	Q_SLOT void slot_stopCrawler();
 
 	Q_SIGNAL void signal_addUrl(const std::string& url, 

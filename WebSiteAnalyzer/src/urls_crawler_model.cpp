@@ -49,6 +49,15 @@ QVariant UrlsCrawlerModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
+bool UrlsCrawlerModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+	beginResetModel();
+	m_urls.clear();
+	endResetModel();
+
+	return true;
+}
+
 void UrlsCrawlerModel::slot_addUrl(const std::string& url, 
 	const std::string& title, 
 	const std::string& description, 

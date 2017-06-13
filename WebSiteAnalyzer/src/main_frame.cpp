@@ -1,6 +1,5 @@
 #include "main_frame.h"
 #include "start_settings_dialog.h"
-#include "crawler_worker.h"
 #include "crawler_settings.h"
 #include "external_urls_model.h"
 #include "urls_crawler_model.h"
@@ -32,15 +31,37 @@ void MainFrame::slot_hideProgressBarWhenStoppingCrawler()
 
 void MainFrame::slot_showStartSettingsDialog()
 {
-	if (m_startSettingsDialog->exec() == QDialog::Accepted)
+	QTextCodec* codec = QTextCodec::codecForLocale();
+
+	if (m_worker->isStopped())
 	{
-		m_settings->setHost(m_startSettingsDialog->startAddress().toStdString());
-		m_settings->setMaxCrawlUrls(m_startSettingsDialog->maxCrawlUrls());
-		m_settings->setRequestPause(std::chrono::milliseconds(m_startSettingsDialog->requestPause()));
+		QMessageBox continueDialog;
 
-		emit signal_startCrawlerCommand(m_settings.get());
+		continueDialog.setWindowTitle(codec->toUnicode("Уведомление"));
+		continueDialog.setText(codec->toUnicode("Продолжить?"));
+		continueDialog.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 
-		ui.progressBar->show();
+		if (continueDialog.exec() == QMessageBox::Ok)
+		{
+			emit signal_startCrawlerCommand(m_settings.get(), true);
+
+			ui.progressBar->show();
+		}
+	}
+	else
+	{
+		if (m_startSettingsDialog->exec() == QDialog::Accepted)
+		{
+			m_settings->setHost(m_startSettingsDialog->startAddress().toStdString());
+			m_settings->setMaxCrawlUrls(m_startSettingsDialog->maxCrawlUrls());
+			m_settings->setRequestPause(std::chrono::milliseconds(m_startSettingsDialog->requestPause()));
+
+			clearModels();
+
+			emit signal_startCrawlerCommand(m_settings.get(), false);
+
+			ui.progressBar->show();
+		}
 	}
 }
 
@@ -74,6 +95,17 @@ void MainFrame::slot_DNSError()
 	QMessageBox::critical(this, "DNS Error", "Cannot resolve address", QMessageBox::Ok);
 }
 
+void MainFrame::clearModels()
+{
+	ui.crawlerTableView->model()->removeRows(0, ui.crawlerTableView->model()->rowCount(), QModelIndex());
+	ui.externalUrlsTableView->model()->removeRows(0, ui.externalUrlsTableView->model()->rowCount(), QModelIndex());
+	ui.pages404TableView->model()->removeRows(0, ui.pages404TableView->model()->rowCount(), QModelIndex());
+	ui.titleDuplicatesTableView->model()->removeRows(0, ui.titleDuplicatesTableView->model()->rowCount(), QModelIndex());
+	ui.descriptionDuplicatesTableView->model()->removeRows(0, ui.descriptionDuplicatesTableView->model()->rowCount(), QModelIndex());
+	ui.missingTitleTableView->model()->removeRows(0, ui.missingTitleTableView->model()->rowCount(), QModelIndex());
+	ui.missingDescriptionTableView->model()->removeRows(0, ui.missingDescriptionTableView->model()->rowCount(), QModelIndex());
+}
+
 void MainFrame::initialize()
 {
 	ui.setupUi(this);
@@ -103,7 +135,7 @@ void MainFrame::initializeModelsAndViews()
 
 
 	ui.crawlerTableView->verticalHeader()->hide();
-	ui.crawlerTableView->horizontalHeader()->setDefaultSectionSize(ui.crawlerTableView->width() / crawlerModel->columnCount());
+	ui.crawlerTableView->horizontalHeader()->setDefaultSectionSize(width() / crawlerModel->columnCount());
 	ui.crawlerTableView->setModel(crawlerModel);
 
 
@@ -135,47 +167,47 @@ void MainFrame::initializeModelsAndViews()
 	ui.missingTitleTableView->setModel(emptyTitlesModel);
 
 
-	CrawlerWorker* worker = new CrawlerWorker;
-	worker->moveToThread(&m_crawlerThread);
+	m_worker = new CrawlerWorker;
+	m_worker->moveToThread(&m_crawlerThread);
 
 
 	VERIFY(connect(&m_crawlerThread, &QThread::finished,
-		worker, &QObject::deleteLater));
+		m_worker, &QObject::deleteLater));
 
 	//
 	// model/view connections
 	//
 
-	VERIFY(connect(worker, &CrawlerWorker::signal_addUrl,
+	VERIFY(connect(m_worker, &CrawlerWorker::signal_addUrl,
 		crawlerModel, &UrlsCrawlerModel::slot_addUrl, Qt::BlockingQueuedConnection));
 
-	VERIFY(connect(worker, &CrawlerWorker::signal_addExternalUrl,
+	VERIFY(connect(m_worker, &CrawlerWorker::signal_addExternalUrl,
 		externalUrlsModel, &ExternalUrlsModel::slot_addUrl, Qt::BlockingQueuedConnection));
 
-	VERIFY(connect(worker, &CrawlerWorker::signal_add404Url,
+	VERIFY(connect(m_worker, &CrawlerWorker::signal_add404Url,
 		pages404Model, &Pages404Model::slot_addUrl, Qt::BlockingQueuedConnection));
 
-	VERIFY(connect(worker, &CrawlerWorker::signal_addDuplicatedTitleUrl,
+	VERIFY(connect(m_worker, &CrawlerWorker::signal_addDuplicatedTitleUrl,
 		duplicatedTitlesModel, &DuplicatedTitlesModel::slot_addUrl, Qt::BlockingQueuedConnection));
 
-	VERIFY(connect(worker, &CrawlerWorker::signal_addDuplicatedDescriptionUrl,
+	VERIFY(connect(m_worker, &CrawlerWorker::signal_addDuplicatedDescriptionUrl,
 		duplicatedDescriptionsModel, &DuplicatedDescriptionsModel::slot_addUrl, Qt::BlockingQueuedConnection));
 
-	VERIFY(connect(worker, &CrawlerWorker::signal_addEmptyDescriptionUrl,
+	VERIFY(connect(m_worker, &CrawlerWorker::signal_addEmptyDescriptionUrl,
 		emptyDescriptionsModel, &EmptyDescriptionsModel::slot_addUrl, Qt::BlockingQueuedConnection));
 
-	VERIFY(connect(worker, &CrawlerWorker::signal_addEmptyTitleUrl,
+	VERIFY(connect(m_worker, &CrawlerWorker::signal_addEmptyTitleUrl,
 		emptyTitlesModel, &EmptyTitlesModel::slot_addUrl, Qt::BlockingQueuedConnection));
 
 
 
-	VERIFY(connect(worker, &CrawlerWorker::signal_queueSize,
+	VERIFY(connect(m_worker, &CrawlerWorker::signal_queueSize,
 		this, &MainFrame::slot_queueSize, Qt::BlockingQueuedConnection));
 
-	VERIFY(connect(worker, &CrawlerWorker::signal_DNSError,
+	VERIFY(connect(m_worker, &CrawlerWorker::signal_DNSError,
 		this, &MainFrame::slot_DNSError, Qt::QueuedConnection));
 	
-	VERIFY(connect(worker, &CrawlerWorker::signal_progressStopped,
+	VERIFY(connect(m_worker, &CrawlerWorker::signal_progressStopped,
 		ui.progressBar, &QProgressBar::hide, Qt::QueuedConnection));
 
 	//
@@ -183,10 +215,10 @@ void MainFrame::initializeModelsAndViews()
 	//
 
 	VERIFY(connect(this, &MainFrame::signal_stopCrawlerCommand,
-		worker, &CrawlerWorker::slot_stopCrawler, Qt::DirectConnection));
+		m_worker, &CrawlerWorker::slot_stopCrawler, Qt::DirectConnection));
 
 	VERIFY(connect(this, &MainFrame::signal_startCrawlerCommand,
-		worker, &CrawlerWorker::slot_startCrawler));
+		m_worker, &CrawlerWorker::slot_startCrawler));
 }
 
 }

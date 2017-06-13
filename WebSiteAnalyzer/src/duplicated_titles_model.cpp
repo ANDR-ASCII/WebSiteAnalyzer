@@ -49,6 +49,15 @@ QVariant DuplicatedTitlesModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
+bool DuplicatedTitlesModel::removeRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
+{
+	beginResetModel();
+	m_urlTitlePairs.clear();
+	endResetModel();
+
+	return true;
+}
+
 void DuplicatedTitlesModel::slot_addUrl(const std::string& url, const std::string& title, const std::string& charset)
 {
 	const bool isUtf8 = charset.find("utf-8") != std::string::npos;

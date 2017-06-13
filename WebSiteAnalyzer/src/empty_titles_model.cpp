@@ -41,6 +41,15 @@ QVariant EmptyTitlesModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
+bool EmptyTitlesModel::removeRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
+{
+	beginResetModel();
+	m_urls.clear();
+	endResetModel();
+
+	return true;
+}
+
 void EmptyTitlesModel::slot_addUrl(const std::string& url)
 {
 	beginResetModel();

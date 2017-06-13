@@ -10,6 +10,11 @@ CrawlerWorker::CrawlerWorker()
 {
 }
 
+bool CrawlerWorker::isStopped() const
+{
+	return m_needToStopCrawling;
+}
+
 void CrawlerWorker::receiveMessage(const IMessage& message)
 {
 	switch (message.type())
@@ -111,12 +116,20 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 	}
 }
 
-void CrawlerWorker::slot_startCrawler(CrawlerSettings* settings)
+void CrawlerWorker::slot_startCrawler(CrawlerSettings* settings, bool aboutToContinue)
 {
+	m_needToStopCrawling.store(false);
+
 	//
 	// when closes program this thread will attempt to access
 	// to deleted object. Need to copy
 	//
+
+	if (!aboutToContinue)
+	{
+		m_model->clear();
+	}
+
 	CrawlerSettings selfSettings = *settings;
 
 	m_controller->setModel(m_model.get());
@@ -128,8 +141,6 @@ void CrawlerWorker::slot_startCrawler(CrawlerSettings* settings)
 
 	m_controller->deleteReceiver(this);
 	m_model->deleteReceiver(this);
-
-	m_needToStopCrawling.store(false);
 }
 
 void CrawlerWorker::slot_stopCrawler()

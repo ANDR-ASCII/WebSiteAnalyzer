@@ -41,6 +41,15 @@ QVariant ExternalUrlsModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
+bool ExternalUrlsModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+	beginResetModel();
+	m_urls.clear();
+	endResetModel();
+
+	return true;
+}
+
 void ExternalUrlsModel::slot_addUrl(const std::string& url)
 {
 	beginResetModel();

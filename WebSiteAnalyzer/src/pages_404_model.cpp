@@ -41,6 +41,15 @@ QVariant Pages404Model::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
+bool Pages404Model::removeRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
+{
+	beginResetModel();
+	m_urls.clear();
+	endResetModel();
+
+	return true;
+}
+
 void Pages404Model::slot_addUrl(const std::string& url)
 {
 	beginResetModel();

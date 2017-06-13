@@ -52,6 +52,8 @@ public:
 	void addTitle(const Url& url, const std::string& title);
 	void addDescription(const Url& url, const std::string& description);
 
+	void clear();
+
 private:
 	Queue m_internalUrlQueue;
 	Queue m_internalCrawledUrlQueue;

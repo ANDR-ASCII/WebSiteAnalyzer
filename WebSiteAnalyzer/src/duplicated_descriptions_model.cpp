@@ -49,6 +49,15 @@ QVariant DuplicatedDescriptionsModel::data(const QModelIndex& index, int role) c
 	return QVariant();
 }
 
+bool DuplicatedDescriptionsModel::removeRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
+{
+	beginResetModel();
+	m_urlDescriptionPairs.clear();
+	endResetModel();
+
+	return true;
+}
+
 void DuplicatedDescriptionsModel::slot_addUrl(const std::string& url, const std::string& description, const std::string& charset)
 {
 	const bool isUtf8 = charset.find("utf-8") != std::string::npos;

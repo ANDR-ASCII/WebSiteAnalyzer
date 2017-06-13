@@ -18,6 +18,8 @@ public:
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 	virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
+	virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+
 	Q_SLOT void slot_addUrl(const std::string& url, const std::string& title, const std::string& charset);
 
 private:

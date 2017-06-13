@@ -225,4 +225,16 @@ void CrawlerModel::addDescription(const Url& url, const std::string& description
 	}
 }
 
+void CrawlerModel::clear()
+{
+	m_internalUrlQueue.clear();
+	m_internalCrawledUrlQueue.clear();
+
+	m_externalUrlQueue.clear();
+	m_externalCrawledUrlQueue.clear();
+
+	m_duplicatedTitles.clear();
+	m_duplicatedDescriptions.clear();
+}
+
 }

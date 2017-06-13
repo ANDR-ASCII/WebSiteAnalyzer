@@ -26,6 +26,7 @@ public:
 	Q_SLOT void slot_showStartSettingsDialog();
 	Q_SLOT void slot_queueSize(std::size_t size, int queueType);
 	Q_SLOT void slot_DNSError();
+	Q_SLOT void slot_resetCrawling();
 
 private:
 	void clearModels();

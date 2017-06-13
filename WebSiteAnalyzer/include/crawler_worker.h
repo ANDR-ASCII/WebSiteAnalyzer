@@ -19,6 +19,9 @@ class CrawlerWorker
 public:
 	CrawlerWorker();
 
+	bool isCrawlerInPending() const;
+	void setAboutToStopFlag(bool value);
+
 	bool isStopped() const;
 
 	Q_SLOT void slot_startCrawler(CrawlerSettings* settings, bool aboutToContinue);
@@ -52,6 +55,7 @@ private:
 	std::unique_ptr<CrawlerController> m_controller;
 
 	std::atomic_bool m_needToStopCrawling;
+	std::atomic_bool m_crawlerInPending;
 };
 
 }

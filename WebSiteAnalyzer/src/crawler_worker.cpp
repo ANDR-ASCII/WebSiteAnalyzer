@@ -7,7 +7,18 @@ CrawlerWorker::CrawlerWorker()
 	: m_model(new CrawlerModel)
 	, m_controller(new CrawlerController)
 	, m_needToStopCrawling(false)
+	, m_crawlerInPending(true)
 {
+}
+
+bool CrawlerWorker::isCrawlerInPending() const
+{
+	return m_crawlerInPending;
+}
+
+void CrawlerWorker::setAboutToStopFlag(bool value)
+{
+	m_needToStopCrawling.store(value);
 }
 
 bool CrawlerWorker::isStopped() const
@@ -119,6 +130,7 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 void CrawlerWorker::slot_startCrawler(CrawlerSettings* settings, bool aboutToContinue)
 {
 	m_needToStopCrawling.store(false);
+	m_crawlerInPending.store(false);
 
 	//
 	// when closes program this thread will attempt to access
@@ -141,6 +153,8 @@ void CrawlerWorker::slot_startCrawler(CrawlerSettings* settings, bool aboutToCon
 
 	m_controller->deleteReceiver(this);
 	m_model->deleteReceiver(this);
+
+	m_crawlerInPending.store(true);
 }
 
 void CrawlerWorker::slot_stopCrawler()

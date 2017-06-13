@@ -31,6 +31,11 @@ void MainFrame::slot_hideProgressBarWhenStoppingCrawler()
 
 void MainFrame::slot_showStartSettingsDialog()
 {
+	if (!m_worker->isCrawlerInPending())
+	{
+		return;
+	}
+
 	QTextCodec* codec = QTextCodec::codecForLocale();
 
 	if (m_worker->isStopped())
@@ -95,6 +100,19 @@ void MainFrame::slot_DNSError()
 	QMessageBox::critical(this, "DNS Error", "Cannot resolve address", QMessageBox::Ok);
 }
 
+void MainFrame::slot_resetCrawling()
+{
+	if (m_worker->isCrawlerInPending())
+	{
+		m_worker->setAboutToStopFlag(false);
+		clearModels();
+
+		slot_queueSize(0, CrawlerModel::InternalUrlQueue | CrawlerModel::InternalCrawledUrlQueue);
+		slot_queueSize(0, CrawlerModel::InternalCrawledUrlQueue);
+		slot_queueSize(0, CrawlerModel::ExternalUrlQueue);
+	}
+}
+
 void MainFrame::clearModels()
 {
 	ui.crawlerTableView->model()->removeRows(0, ui.crawlerTableView->model()->rowCount(), QModelIndex());
@@ -114,6 +132,7 @@ void MainFrame::initialize()
 	VERIFY(connect(ui.startCrawlerButton, &QPushButton::clicked, this, &MainFrame::slot_showStartSettingsDialog));
 	VERIFY(connect(ui.stopCrawlerButton, &QPushButton::clicked, this, &MainFrame::signal_stopCrawlerCommand));
 	VERIFY(connect(ui.stopCrawlerButton, &QPushButton::clicked, this, &MainFrame::slot_hideProgressBarWhenStoppingCrawler));
+	VERIFY(connect(ui.resetButton, &QPushButton::clicked, this, &MainFrame::slot_resetCrawling));
 
 	initializeModelsAndViews();
 

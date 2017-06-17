@@ -6,29 +6,24 @@
 namespace WebSiteAnalyzer
 {
 
-class UrlsCrawlerModel : public QAbstractTableModel
+class EmptyTitlesModel : public QAbstractTableModel
 {
 	Q_OBJECT
 public:
-	UrlsCrawlerModel(QObject* parent = nullptr);
-	
+	EmptyTitlesModel(QObject* parent = nullptr);
+
 	virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+	virtual int columnCount(const QModelIndex& parent) const override;
 
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 	virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
 	virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
-	Q_SLOT void slot_addUrl(const std::string& url, 
-		const std::string& title, 
-		const std::string& description, 
-		const std::string& charset, 
-		int responseCode
-	);
+	Q_SLOT void slot_addUrl(const std::string& url);
 
 private:
-	std::deque<std::array<QString, 4>> m_urls;
+	std::deque<QString> m_urls;
 	QStringList m_headerData;
 };
 

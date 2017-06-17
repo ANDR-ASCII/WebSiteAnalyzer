@@ -361,6 +361,12 @@ std::deque<Attribute> TagParserPrivate::readAllTagAttributes(const std::string& 
 			// write attribute name
 			attribute.setName(readUntil(tagString, idx, [this](char ch) { return !isSpace(ch) && !isEqualCharacter(ch); }));
 
+			if (attribute.name() == "/")
+			{
+				attribute.setName(std::string());
+				continue;
+			}
+
 			skipWhitespaces(tagString, idx);
 
 			//

@@ -54,7 +54,7 @@ boost::regex Url::s_archivesRegexPattern(
 	"("
 	// enumeration extensions of archives
 	"tar.gz|tar.xz|tar.bz2|tar|tgz|exe|7z|zip|rar|bin|arj|cab|cbr|deb|gzip|jar|one|pak|pkg|ppt|"
-	"rpm|sh|sib|sis|sisx|sit|sitx|spl|xar|zipx|gz|xz|bz2|sig|patch"
+	"rpm|sh|sib|sis|sisx|sit|sitx|spl|xar|zipx|gz|xz|bz2|sig|patch|pdf|xlsx"
 	")$",
 	boost::regex_constants::icase
 );

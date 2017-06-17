@@ -15,7 +15,6 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 	{
 		try
 		{
-
 			currentUrl.parse(tag.attribute("href"));
 
 			if (!currentUrl.file().empty() && 
@@ -27,9 +26,11 @@ void CrawlerModel::saveUniqueUrls(const TagParser& tagParser, const Url& hostUrl
 
 			if (currentUrl.isAbsoluteAddress() && !currentUrl.compareHost(hostUrl))
 			{
-				if (!isItemExistsIn(currentUrl, ExternalCrawledUrlQueue))
+				if (!isItemExistsIn(currentUrl, ExternalCrawledUrlQueue) && !isItemExistsIn(currentUrl, ExternalUrlQueue))
 				{
 					storeUrl(currentUrl, ExternalUrlQueue);
+
+					sendMessage(UrlMessage{ currentUrl.host(), std::string(), std::string(), std::string(), 200, CrawlerModel::ExternalUrlQueue });
 				}
 
 				continue;
@@ -130,6 +131,110 @@ const CrawlerModel::Queue* CrawlerModel::queue(int queueType) const noexcept
 	}
 
 	return &m_externalUrlQueue;
+}
+
+bool CrawlerModel::isDuplicatedTitle(const Url& url, const std::string& title) const
+{
+	auto iter = m_duplicatedTitles.find(title);
+
+	if (iter != std::end(m_duplicatedTitles))
+	{
+		return iter->second.size() > 1;
+	}
+
+	return false;
+}
+
+bool CrawlerModel::isDuplicatedDescription(const Url& url, const std::string& description) const
+{
+	auto iter = m_duplicatedDescriptions.find(description);
+
+	if (iter != std::end(m_duplicatedDescriptions))
+	{
+		return iter->second.size() > 1;
+	}
+
+	return false;
+}
+
+size_t CrawlerModel::duplicatesTitle(const Url& url, const std::string& title) const
+{
+	auto iter = m_duplicatedTitles.find(title);
+
+	if (iter != std::end(m_duplicatedTitles))
+	{
+		return iter->second.size();
+	}
+
+	return 0;
+}
+
+size_t CrawlerModel::duplicatesDescription(const Url& url, const std::string& description) const
+{
+	auto iter = m_duplicatedDescriptions.find(description);
+
+	if (iter != std::end(m_duplicatedDescriptions))
+	{
+		return iter->second.size();
+	}
+
+	return 0;
+}
+
+const std::string& CrawlerModel::firstDuplicatedTitle(const std::string& title) const
+{
+	return m_duplicatedTitles.find(title)->second.front();
+}
+
+const std::string& CrawlerModel::firstDuplicatedDescription(const std::string& description) const
+{
+	return m_duplicatedDescriptions.find(description)->second.front();
+}
+
+void CrawlerModel::addTitle(const Url& url, const std::string& title)
+{
+	auto iter = m_duplicatedTitles.find(title);
+
+	if (iter != std::end(m_duplicatedTitles))
+	{
+		iter->second.push_back(url.relativePath());
+	}
+	else
+	{
+		Queue queue;
+		queue.push_back(url.relativePath());
+
+		m_duplicatedTitles.insert(std::make_pair(title, std::move(queue)));
+	}
+}
+
+void CrawlerModel::addDescription(const Url& url, const std::string& description)
+{
+	auto iter = m_duplicatedDescriptions.find(description);
+
+	if (iter != std::end(m_duplicatedDescriptions))
+	{
+		iter->second.push_back(url.relativePath());
+	}
+	else
+	{
+		Queue queue;
+		queue.push_back(url.relativePath());
+
+		m_duplicatedDescriptions.insert(std::make_pair(description, std::move(queue)));
+	}
+}
+
+void CrawlerModel::clear()
+{
+	m_internalUrlQueue.clear();
+	m_internalCrawledUrlQueue.clear();
+
+	m_externalUrlQueue.clear();
+	m_externalCrawledUrlQueue.clear();
+
+	m_duplicatedTitles.clear();
+	m_duplicatedDescriptions.clear();
 }
 
 }

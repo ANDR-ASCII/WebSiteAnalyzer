@@ -26,7 +26,153 @@ QTabWidget QWidget #QListView
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_3">
-    <item row="3" column="0" colspan="3">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="startCrawlerButton">
+      <property name="text">
+       <string>Старт</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="stopCrawlerButton">
+      <property name="text">
+       <string>Стоп</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="4">
+     <widget class="Line" name="line_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <spacer name="horizontalSpacer_4">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="6" column="0" colspan="4">
+     <widget class="QProgressBar" name="progressBar">
+      <property name="value">
+       <number>24</number>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0" colspan="4">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0" colspan="4">
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QTabWidget" name="infoWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="crawlerTab">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <attribute name="title">
+         <string>Краулер</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0" colspan="2">
+          <widget class="QTableView" name="crawlerTableView">
+           <property name="gridStyle">
+            <enum>Qt::SolidLine</enum>
+           </property>
+           <attribute name="horizontalHeaderDefaultSectionSize">
+            <number>300</number>
+           </attribute>
+           <attribute name="horizontalHeaderMinimumSectionSize">
+            <number>37</number>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="externalUrlsTab">
+        <attribute name="title">
+         <string>Внешние ссылки</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QTableView" name="externalUrlsTableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="pages404Tab">
+        <attribute name="title">
+         <string>Ошибки 404</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QTableView" name="pages404TableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="titleDuplicatesTab">
+        <attribute name="title">
+         <string>Дубли Title</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="QTableView" name="titleDuplicatesTableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="descriptionDuplicatesTab">
+        <attribute name="title">
+         <string>Дубли Description</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QTableView" name="descriptionDuplicatesTableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="missingTitleTab">
+        <attribute name="title">
+         <string>Отсутствие/Пустота Title</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="QTableView" name="missingTitleTableView"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="missingDescriptionTab">
+        <attribute name="title">
+         <string>Отсутствие/Пустота Description</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <widget class="QTableView" name="missingDescriptionTableView"/>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+    <item row="3" column="0" colspan="4">
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
        <string>Состояние краулера</string>
@@ -116,149 +262,10 @@ QTabWidget QWidget #QListView
       </layout>
      </widget>
     </item>
-    <item row="5" column="0" colspan="3">
-     <widget class="QSplitter" name="splitter">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="childrenCollapsible">
-       <bool>false</bool>
-      </property>
-      <widget class="QTabWidget" name="infoWidget">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="crawlerTab">
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <attribute name="title">
-         <string>Краулер</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0" colspan="2">
-          <widget class="QTableView" name="crawlerTableView">
-           <property name="gridStyle">
-            <enum>Qt::SolidLine</enum>
-           </property>
-           <attribute name="horizontalHeaderDefaultSectionSize">
-            <number>300</number>
-           </attribute>
-           <attribute name="horizontalHeaderMinimumSectionSize">
-            <number>37</number>
-           </attribute>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="externalUrlsTab">
-        <attribute name="title">
-         <string>Внешние ссылки</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <widget class="QListView" name="externalUrlsListView"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="pages404Tab">
-        <attribute name="title">
-         <string>Ошибки 404</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <widget class="QListView" name="pages404ListView"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="titleDuplicatesTab">
-        <attribute name="title">
-         <string>Дубли Title</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
-         <item>
-          <widget class="QTableView" name="titleDuplicatesTableView"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="descriptionDuplicatesTab">
-        <attribute name="title">
-         <string>Дубли Description</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
-         <item>
-          <widget class="QTableView" name="descriptionDuplicatesTableView"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="missingTitleTab">
-        <attribute name="title">
-         <string>Отсутствие/Пустота Title</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_7">
-         <item>
-          <widget class="QListView" name="missingTitleListView"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="missingDescriptionTab">
-        <attribute name="title">
-         <string>Отсутствие/Пустота Description</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_8">
-         <item>
-          <widget class="QListView" name="missingDescriptionListView"/>
-         </item>
-        </layout>
-       </widget>
-      </widget>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QPushButton" name="stopCrawlerButton">
-      <property name="text">
-       <string>Стоп</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0" colspan="3">
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QPushButton" name="startCrawlerButton">
-      <property name="text">
-       <string>Старт</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0" colspan="3">
-     <widget class="Line" name="line_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="2">
-     <spacer name="horizontalSpacer_4">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="6" column="0" colspan="3">
-     <widget class="QProgressBar" name="progressBar">
-      <property name="value">
-       <number>24</number>
+     <widget class="QPushButton" name="resetButton">
+      <property name="text">
+       <string>Сбросить</string>
       </property>
      </widget>
     </item>
@@ -271,25 +278,7 @@ QTabWidget QWidget #QListView
    <zorder>splitter</zorder>
    <zorder>progressBar</zorder>
    <zorder>horizontalSpacer_4</zorder>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1038</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menu">
-    <property name="title">
-     <string>Файл</string>
-    </property>
-    <addaction name="action"/>
-    <addaction name="action_2"/>
-    <addaction name="separator"/>
-   </widget>
-   <addaction name="menu"/>
+   <zorder>resetButton</zorder>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action">

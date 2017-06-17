@@ -4,6 +4,7 @@
 #include "http_connection.h"
 #include "http_request.h"
 #include "http_response.h"
+#include "common.h"
 
 namespace CrawlerImpl
 {
@@ -45,7 +46,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 	request.setHttpVersion(HttpRequest::Version::Version1_1);
 	request.setConnectionType(HttpRequest::ConnectionType::Close);
 
-	while (stopCrawling == false)
+	while (!stopCrawling)
 	{
 		if (model()->queue(CrawlerModel::InternalUrlQueue)->empty())
 		{
@@ -53,9 +54,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 		}
 
 		Url url = model()->queue(CrawlerModel::InternalUrlQueue)->front();
-
 		model()->storeUrl(url, CrawlerModel::InternalCrawledUrlQueue);
-
 		model()->queue(CrawlerModel::InternalUrlQueue)->pop_front();
 
 		std::this_thread::sleep_for(settings()->requestPause());
@@ -74,19 +73,31 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 				sendMessage(DNSErrorMessage{});
 				break;
 			}
-		}
 
-		sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), response->responseCode() });
+			//
+			// TODO: need to handle timeout
+			//
+		}
 
 		if (!response->isValid())
 		{
-			sendMessage(WarningMessage{ "Invalid response of server" });
+			continue;
+		}
+
+		if (response->is_404_NotFound())
+		{
+			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), std::string(), std::string(), std::string(),
+				response->responseCode(), CrawlerModel::InternalCrawledUrlQueue });
+
 			continue;
 		}
 
 		if (response->is_301_MovedPermanently() ||
 			response->is_302_MovedTemporarily())
 		{
+			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), std::string(), std::string(), std::string(),
+				response->responseCode(), CrawlerModel::InternalCrawledUrlQueue });
+
 			handleRedirection(response, request);
 		}
 		else
@@ -94,10 +105,101 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 			tagParser.parseTags(response->entityBody(), "a");
 
 			//
-			// TODO: remove from tagParser all HTTPS urls
+			// TODO: refer to external urls which is not in an external queue urls and check validness of them
 			//
 
 			model()->saveUniqueUrls(tagParser, settings()->startUrlAddress(), url);
+
+			//
+			// Find meta description
+			//
+
+			std::string description;
+			std::string charset;
+
+			tagParser.parseTags(response->entityBody(), "meta");
+
+			if (tagParser.size())
+			{
+				auto findDescription = [](const Tag& tag)
+				{
+					return Common::strToLower(tag.attribute("name")) == "description";
+				};
+
+				auto findCharset = [](const Tag& tag)
+				{
+					return Common::strToLower(tag.attribute("http-equiv")) == "content-type";
+				};
+
+				auto iterDescription = std::find_if(std::begin(tagParser), std::end(tagParser), findDescription);
+				auto iterCharset = std::find_if(std::begin(tagParser), std::end(tagParser), findCharset);
+
+				if (iterCharset != std::end(tagParser))
+				{
+					charset = iterCharset->attribute("content");
+				}
+
+				if (iterDescription != std::end(tagParser))
+				{
+					description = iterDescription->attribute("content");
+
+					if (!description.empty())
+					{
+						model()->addDescription(url, description);
+
+						if (model()->isDuplicatedDescription(url, description))
+						{
+							if (model()->duplicatesDescription(url, description) == 2)
+							{
+								sendMessage(DuplicatedDescriptionMessage{
+									settings()->startUrlAddress().host() + model()->firstDuplicatedDescription(description),
+									description,
+									charset
+								});
+							}
+
+							sendMessage(DuplicatedDescriptionMessage{ settings()->startUrlAddress().host() + url.relativePath(), description, charset });
+						}
+					}
+				}
+
+				if (description.empty())
+				{
+					sendMessage(EmptyDescriptionMessage{ settings()->startUrlAddress().host() + url.relativePath() });
+				}
+			}
+
+			//
+			// Find title tag
+			//
+
+			tagParser.parseTagsWithValues(response->entityBody(), "title");
+
+			std::string title;
+
+			if (!tagParser.size() || (tagParser.size() && tagParser[0].value().empty()))
+			{
+				sendMessage(EmptyTitleMessage{ settings()->startUrlAddress().host() + url.relativePath() });
+			}
+			else
+			{
+				title = tagParser[0].value();
+
+				model()->addTitle(url, title);
+
+				if (model()->isDuplicatedTitle(url, title))
+				{
+					if (model()->duplicatesTitle(url, title) == 2)
+					{
+						sendMessage(DuplicatedTitleMessage{ settings()->startUrlAddress().host() + model()->firstDuplicatedTitle(title), title, charset });
+					}
+
+					sendMessage(DuplicatedTitleMessage{ settings()->startUrlAddress().host() + url.relativePath(), title, charset });
+				}
+			}
+
+			sendMessage(UrlMessage{ settings()->startUrlAddress().host() + url.relativePath(), title, description, charset,
+				response->responseCode(), CrawlerModel::InternalCrawledUrlQueue });
 		}
 
 		sendMessage(QueueSizeMessage{ CrawlerModel::InternalUrlQueue | CrawlerModel::InternalCrawledUrlQueue, 
@@ -108,7 +210,7 @@ void CrawlerController::startCrawling(const std::atomic_bool& stopCrawling)
 		sendMessage(QueueSizeMessage{ CrawlerModel::ExternalUrlQueue, model()->size(CrawlerModel::ExternalUrlQueue) });
 	}
 
-	sendMessage(WarningMessage{ "Crawling ended up!" });
+	sendMessage(ProgressStoppedMessage{});
 }
 
 void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response, HttpLib::HttpRequest& request)
@@ -126,13 +228,22 @@ void CrawlerController::handleRedirection(const HttpLib::HttpResponse* response,
 
 	if (url.compareHost(settings()->startUrlAddress()) || url.host().empty())
 	{
-		model()->storeUrl(url, CrawlerModel::InternalUrlQueue);
+		if (!model()->isItemExistsIn(url, CrawlerModel::InternalCrawledUrlQueue))
+		{
+			model()->storeUrl(url, CrawlerModel::InternalUrlQueue);
+		}
 	}
 	else
 	{
 		settings()->setHost(url);
 		request.setHost(url.host());
-		model()->storeUrl(url, CrawlerModel::InternalUrlQueue);
+
+		model()->queue(CrawlerModel::InternalCrawledUrlQueue)->clear();
+
+		if (!model()->isItemExistsIn(url, CrawlerModel::InternalCrawledUrlQueue))
+		{
+			model()->storeUrl(url, CrawlerModel::InternalUrlQueue);
+		}
 	}
 }
 

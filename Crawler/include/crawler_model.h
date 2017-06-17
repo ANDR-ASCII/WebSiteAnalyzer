@@ -40,12 +40,29 @@ public:
 	Queue* queue(int queueType) noexcept;
 	const Queue* queue(int queueType) const noexcept;
 
+	bool isDuplicatedTitle(const Url& url, const std::string& title) const;
+	bool isDuplicatedDescription(const Url& url, const std::string& description) const;
+
+	size_t duplicatesTitle(const Url& url, const std::string& title) const;
+	size_t duplicatesDescription(const Url& url, const std::string& description) const;
+
+	const std::string& firstDuplicatedTitle(const std::string& title) const;
+	const std::string& firstDuplicatedDescription(const std::string& description) const;
+
+	void addTitle(const Url& url, const std::string& title);
+	void addDescription(const Url& url, const std::string& description);
+
+	void clear();
+
 private:
 	Queue m_internalUrlQueue;
 	Queue m_internalCrawledUrlQueue;
 
 	Queue m_externalUrlQueue;
 	Queue m_externalCrawledUrlQueue;
+
+	std::unordered_map<std::string, Queue> m_duplicatedTitles;
+	std::unordered_map<std::string, Queue> m_duplicatedDescriptions;
 };
 
 }

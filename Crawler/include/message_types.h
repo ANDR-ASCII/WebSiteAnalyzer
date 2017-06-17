@@ -14,12 +14,29 @@ public:
 		Url,
 		DNSError,
 		CurrentQueueSize,
-		QueueItersAndRefsInvalidated,
 		HttpResponseCode,
-		WarningType
+		WarningType,
+		DuplicatedTitle,
+		DuplicatedDescription,
+		EmptyTitle,
+		EmptyDescription,
+		ProgressStopped
 	};
 
 	virtual MessageType type() const noexcept = 0;
+};
+
+class ProgressStoppedMessage : public IMessage
+{
+public:
+	ProgressStoppedMessage()
+	{
+	}
+
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::ProgressStopped;
+	}
 };
 
 class WarningMessage : public IMessage
@@ -66,28 +83,6 @@ private:
 	int m_codeResponse;
 };
 
-class QueueItersAndRefsInvalidatedMessage : public IMessage
-{
-public:
-	QueueItersAndRefsInvalidatedMessage(int queueType)
-		: m_queueType(queueType)
-	{
-	}
-
-	virtual MessageType type() const noexcept override
-	{
-		return MessageType::QueueItersAndRefsInvalidated;
-	}
-
-	int queueType() const noexcept
-	{
-		return m_queueType;
-	}
-
-private:
-	int m_queueType;
-};
-
 class QueueSizeMessage : public IMessage
 {
 public:
@@ -120,9 +115,18 @@ private:
 class UrlMessage : public IMessage
 {
 public:
-	UrlMessage(const std::string& url, int responseCode)
+	UrlMessage(const std::string& url, 
+		const std::string& title, 
+		const std::string& description,
+		const std::string& charset,
+		int responseCode, 
+		int queueType)
 		: m_url(url)
+		, m_title(title)
+		, m_description(description)
+		, m_charset(charset)
 		, m_responseCode(responseCode)
+		, m_queueType(queueType)
 	{
 	}
 
@@ -131,9 +135,29 @@ public:
 		return m_url;
 	}
 
+	const std::string& title() const noexcept
+	{
+		return m_title;
+	}
+
+	const std::string& description() const noexcept
+	{
+		return m_description;
+	}
+
+	const std::string& charset() const noexcept
+	{
+		return m_charset;
+	}
+
 	int responseCode() const noexcept
 	{
 		return m_responseCode;
+	}
+
+	int queueType() const noexcept
+	{
+		return m_queueType;
 	}
 
 	virtual MessageType type() const noexcept override
@@ -143,7 +167,11 @@ public:
 
 private:
 	std::string m_url;
+	std::string m_title;
+	std::string m_description;
+	std::string m_charset;
 	int m_responseCode;
+	int m_queueType;
 };
 
 class DNSErrorMessage : public IMessage
@@ -153,6 +181,122 @@ public:
 	{
 		return MessageType::DNSError;
 	}
+};
+
+class DuplicatedTitleMessage : public IMessage
+{
+public:
+	DuplicatedTitleMessage(const std::string& url, const std::string& title, const std::string& charset)
+		: m_url(url)
+		, m_title(title)
+		, m_charset(charset)
+	{
+	}
+
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::DuplicatedTitle;
+	}
+
+	const std::string& url() const noexcept
+	{
+		return m_url;
+	}
+
+	const std::string& title() const noexcept
+	{
+		return m_title;
+	}
+
+	const std::string& charset() const noexcept
+	{
+		return m_charset;
+	}
+
+private:
+	std::string m_url;
+	std::string m_title;
+	std::string m_charset;
+};
+
+class DuplicatedDescriptionMessage : public IMessage
+{
+public:
+	DuplicatedDescriptionMessage(const std::string& url, const std::string& description, const std::string& charset)
+		: m_url(url)
+		, m_description(description)
+		, m_charset(charset)
+	{
+	}
+
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::DuplicatedDescription;
+	}
+
+	const std::string& url() const noexcept
+	{
+		return m_url;
+	}
+
+	const std::string& description() const noexcept
+	{
+		return m_description;
+	}
+
+	const std::string& charset() const noexcept
+	{
+		return m_charset;
+	}
+
+private:
+	std::string m_url;
+	std::string m_description;
+	std::string m_charset;
+};
+
+class EmptyTitleMessage : public IMessage
+{
+public:
+	EmptyTitleMessage(const std::string& url)
+		: m_url(url)
+	{
+	}
+
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::EmptyTitle;
+	}
+
+	const std::string& url() const noexcept
+	{
+		return m_url;
+	}
+
+private:
+	std::string m_url;
+};
+
+class EmptyDescriptionMessage : public IMessage
+{
+public:
+	EmptyDescriptionMessage(const std::string& url)
+		: m_url(url)
+	{
+	}
+
+	virtual MessageType type() const noexcept override
+	{
+		return MessageType::EmptyDescription;
+	}
+
+	const std::string& url() const noexcept
+	{
+		return m_url;
+	}
+
+private:
+	std::string m_url;
 };
 
 }

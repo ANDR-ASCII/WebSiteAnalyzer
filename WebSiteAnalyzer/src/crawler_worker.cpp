@@ -7,7 +7,23 @@ CrawlerWorker::CrawlerWorker()
 	: m_model(new CrawlerModel)
 	, m_controller(new CrawlerController)
 	, m_needToStopCrawling(false)
+	, m_crawlerInPending(true)
 {
+}
+
+bool CrawlerWorker::isCrawlerInPending() const
+{
+	return m_crawlerInPending;
+}
+
+void CrawlerWorker::setAboutToStopFlag(bool value)
+{
+	m_needToStopCrawling.store(value);
+}
+
+bool CrawlerWorker::isStopped() const
+{
+	return m_needToStopCrawling;
 }
 
 void CrawlerWorker::receiveMessage(const IMessage& message)
@@ -19,7 +35,24 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 			const UrlMessage& actualMessage =
 				static_cast<const UrlMessage&>(message);
 
-			emit signal_addUrl(actualMessage.url(), actualMessage.responseCode());
+			if (actualMessage.queueType() == CrawlerModel::ExternalUrlQueue)
+			{
+				emit signal_addExternalUrl(actualMessage.url());
+
+				return;
+			}
+
+			if (actualMessage.responseCode() == 404)
+			{
+				emit signal_add404Url(actualMessage.url());
+			}
+			
+			emit signal_addUrl(actualMessage.url(), 
+				actualMessage.title(), 
+				actualMessage.description(), 
+				actualMessage.charset(), 
+				actualMessage.responseCode()
+			);
 
 			break;
 		}
@@ -40,20 +73,88 @@ void CrawlerWorker::receiveMessage(const IMessage& message)
 
 			break;
 		}
+
+		//
+		// errors handling
+		//
+
+		case IMessage::MessageType::DuplicatedTitle:
+		{
+			const DuplicatedTitleMessage& actualMessage =
+				static_cast<const DuplicatedTitleMessage&>(message);
+
+			emit signal_addDuplicatedTitleUrl(actualMessage.url(), actualMessage.title(), actualMessage.charset());
+
+			break;
+		}
+
+		case IMessage::MessageType::DuplicatedDescription:
+		{
+			const DuplicatedDescriptionMessage& actualMessage =
+				static_cast<const DuplicatedDescriptionMessage&>(message);
+
+			emit signal_addDuplicatedDescriptionUrl(actualMessage.url(), actualMessage.description(), actualMessage.charset());
+
+			break;
+		}
+
+		case IMessage::MessageType::EmptyTitle:
+		{
+			const EmptyTitleMessage& actualMessage =
+				static_cast<const EmptyTitleMessage&>(message);
+
+			emit signal_addEmptyTitleUrl(actualMessage.url());
+
+			break;
+		}
+
+		case IMessage::MessageType::EmptyDescription:
+		{
+			const EmptyDescriptionMessage& actualMessage =
+				static_cast<const EmptyDescriptionMessage&>(message);
+
+			emit signal_addEmptyDescriptionUrl(actualMessage.url());
+
+			break;
+		}
+
+		case IMessage::MessageType::ProgressStopped:
+		{
+			emit signal_progressStopped();
+
+			break;
+		}
 	}
 }
 
-void CrawlerWorker::slot_startCrawler(CrawlerSettings* settings)
+void CrawlerWorker::slot_startCrawler(CrawlerSettings* settings, bool aboutToContinue)
 {
+	m_needToStopCrawling.store(false);
+	m_crawlerInPending.store(false);
+
+	//
+	// when closes program this thread will attempt to access
+	// to deleted object. Need to copy
+	//
+
+	if (!aboutToContinue)
+	{
+		m_model->clear();
+	}
+
+	CrawlerSettings selfSettings = *settings;
+
 	m_controller->setModel(m_model.get());
-	m_controller->setSettings(settings);
+	m_controller->setSettings(&selfSettings);
 	m_controller->addReceiver(this);
+	m_model->addReceiver(this);
 
 	m_controller->startCrawling(m_needToStopCrawling);
 
 	m_controller->deleteReceiver(this);
+	m_model->deleteReceiver(this);
 
-	m_needToStopCrawling.store(false);
+	m_crawlerInPending.store(true);
 }
 
 void CrawlerWorker::slot_stopCrawler()
